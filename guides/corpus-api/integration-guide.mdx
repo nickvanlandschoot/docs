@@ -15,7 +15,7 @@ Contact your Intrace representative to receive an API key. The API key is requir
 
 ### 2. Base URLs
 
-**Production**: `https://api.intrace.com`
+**Production**: `https://api.corpus.intrace.ai`
 **Development**: `http://localhost:8000` (for testing)
 
 ### 3. Authentication
@@ -24,10 +24,25 @@ All requests must include your API key in the `X-API-Key` header:
 
 ```bash
 curl -H "X-API-Key: your-api-key-here" \
-  https://api.intrace.com/v1/corpus/events
+  https://api.corpus.intrace.ai/v1/corpus/events
 ```
 
 ## Common Use Cases
+
+### Available Event Filters
+
+The `/v1/corpus/events` endpoint supports the following filter parameters:
+
+- **`event_category`** - Filter by category (e.g., "conflict", "cyber", "crime")
+- **`event_type`** - Filter by type within a category
+- **`country`** - Filter by country name
+- **`date_from`** - Inclusive start date (YYYY-MM-DD)
+- **`date_to`** - Inclusive end date (YYYY-MM-DD)
+- **`search`** - Full-text search across title and description
+- **`sort_by`** - Sort column (default: "event_date")
+- **`sort_order`** - Sort direction: "asc" or "desc" (default: "desc")
+
+**Note:** Direct filtering by `event_subtype` is not currently supported. Event subtypes are included in response data but cannot be used as a filter parameter. To find events with specific subtypes, retrieve events and filter the results client-side.
 
 ### Query Events by Category
 
@@ -37,7 +52,7 @@ Filter events by category to focus on specific domains:
 import requests
 
 response = requests.get(
-    "https://api.intrace.com/v1/corpus/events",
+    "https://api.corpus.intrace.ai/v1/corpus/events",
     headers={"X-API-Key": "your-api-key"},
     params={
         "event_category": "cyber",
@@ -63,7 +78,7 @@ end_date = date.today()
 start_date = end_date - timedelta(days=30)
 
 response = requests.get(
-    "https://api.intrace.com/v1/corpus/events",
+    "https://api.corpus.intrace.ai/v1/corpus/events",
     headers={"X-API-Key": "your-api-key"},
     params={
         "date_from": start_date.isoformat(),
@@ -80,7 +95,7 @@ Search across event titles and descriptions:
 
 ```python
 response = requests.get(
-    "https://api.intrace.com/v1/corpus/events",
+    "https://api.corpus.intrace.ai/v1/corpus/events",
     headers={"X-API-Key": "your-api-key"},
     params={
         "search": "ransomware attack",
@@ -91,20 +106,24 @@ response = requests.get(
 
 ### Get Event Details
 
-Retrieve full details including actors and metadata:
+Retrieve full details including category-specific data:
 
 ```python
 event_id = "550e8400-e29b-41d4-a716-446655440000"
 
 response = requests.get(
-    f"https://api.intrace.com/v1/corpus/events/{event_id}",
+    f"https://api.corpus.intrace.ai/v1/corpus/events/{event_id}",
     headers={"X-API-Key": "your-api-key"}
 )
 
 event = response.json()
 print(f"Event: {event['title']}")
-print(f"Actors: {[a['canonical_name'] for a in event['actors']]}")
-print(f"Metadata: {event['metadata']}")
+print(f"Category: {event['eventCategory']}")
+print(f"Location: {event['location']} ({event['locationCountry']})")
+
+# Category-specific fields (e.g., fatalities for conflict events)
+if event.get('categorySpecificData'):
+    print(f"Details: {event['categorySpecificData']}")
 ```
 
 ### Export Data
@@ -114,7 +133,7 @@ Export filtered events in various formats:
 ```python
 # Export as CSV
 response = requests.get(
-    "https://api.intrace.com/v1/corpus/events/export",
+    "https://api.corpus.intrace.ai/v1/corpus/events/export",
     headers={"X-API-Key": "your-api-key"},
     params={
         "format": "csv",
@@ -129,7 +148,7 @@ with open("political_events_jan2026.csv", "wb") as f:
 
 # Export as GeoJSON for mapping
 response = requests.get(
-    "https://api.intrace.com/v1/corpus/events/export",
+    "https://api.corpus.intrace.ai/v1/corpus/events/export",
     headers={"X-API-Key": "your-api-key"},
     params={
         "format": "geojson",
@@ -148,7 +167,7 @@ Use metadata endpoints to find valid filter values:
 ```python
 # Get all available categories
 categories = requests.get(
-    "https://api.intrace.com/v1/corpus/metadata/event-categories",
+    "https://api.corpus.intrace.ai/v1/corpus/metadata/event-categories",
     headers={"X-API-Key": "your-api-key"}
 ).json()
 
@@ -158,7 +177,7 @@ for cat in categories['categories']:
 
 # Get types within a category
 types = requests.get(
-    "https://api.intrace.com/v1/corpus/metadata/event-types",
+    "https://api.corpus.intrace.ai/v1/corpus/metadata/event-types",
     headers={"X-API-Key": "your-api-key"},
     params={"category": "cyber"}
 ).json()
@@ -180,7 +199,7 @@ def get_all_events(category: str):
 
     while True:
         response = requests.get(
-            "https://api.intrace.com/v1/corpus/events",
+            "https://api.corpus.intrace.ai/v1/corpus/events",
             headers={"X-API-Key": "your-api-key"},
             params={
                 "event_category": category,
@@ -192,7 +211,7 @@ def get_all_events(category: str):
         data = response.json()
         all_events.extend(data['items'])
 
-        if page >= data['total_pages']:
+        if page >= data['totalPages']:
             break
 
         page += 1
@@ -215,7 +234,7 @@ import requests
 from typing import List, Dict, Any
 
 class IntraceCorpusClient:
-    def __init__(self, api_key: str, base_url: str = "https://api.intrace.com"):
+    def __init__(self, api_key: str, base_url: str = "https://api.corpus.intrace.ai"):
         self.api_key = api_key
         self.base_url = base_url
         self.headers = {"X-API-Key": api_key}
@@ -294,7 +313,7 @@ Example using fetch API:
 class IntraceCorpusClient {
   constructor(
     private apiKey: string,
-    private baseUrl: string = "https://api.intrace.com"
+    private baseUrl: string = "https://api.corpus.intrace.ai"
   ) {}
 
   async listEvents(params: {
@@ -366,20 +385,20 @@ Basic cURL examples:
 ```bash
 # List events
 curl -H "X-API-Key: your-api-key" \
-  "https://api.intrace.com/v1/corpus/events?event_category=conflict&page=1&page_size=10"
+  "https://api.corpus.intrace.ai/v1/corpus/events?event_category=conflict&page=1&page_size=10"
 
 # Get specific event
 curl -H "X-API-Key: your-api-key" \
-  "https://api.intrace.com/v1/corpus/events/550e8400-e29b-41d4-a716-446655440000"
+  "https://api.corpus.intrace.ai/v1/corpus/events/550e8400-e29b-41d4-a716-446655440000"
 
 # Export to CSV
 curl -H "X-API-Key: your-api-key" \
-  "https://api.intrace.com/v1/corpus/events/export?format=csv&event_category=cyber" \
+  "https://api.corpus.intrace.ai/v1/corpus/events/export?format=csv&event_category=cyber" \
   -o cyber_events.csv
 
 # Get metadata
 curl -H "X-API-Key: your-api-key" \
-  "https://api.intrace.com/v1/corpus/metadata/event-categories"
+  "https://api.corpus.intrace.ai/v1/corpus/metadata/event-categories"
 ```
 
 ## Export Formats
@@ -410,19 +429,81 @@ Geographic data format following RFC 7946 specification.
 
 ### ACLED Format
 
-Compatible with ACLED (Armed Conflict Location & Event Data Project) schema.
+Compatible with ACLED (Armed Conflict Location & Event Data Project) schema. **Only available for conflict category events.**
 
 - **Use case**: Integration with existing ACLED workflows and tools
 - **File extension**: `.json`
 - **MIME type**: `application/json`
 
+**Actor Position Fields:**
+- `actor1`, `actor2`: Principal and secondary actors
+- `assoc_actor_1`, `assoc_actor_2`: Internal sub-units (semicolon-separated)
+- `supporting_actor_1`, `supporting_actor_2`: External supporting actors (comma-separated)
+- `inter1`, `inter2`: Inter-group codes (1=state, 2=rebel, 3=political militia, etc.)
+- `interaction`: Combined interaction code (e.g., "1-2" for state vs rebel)
+
+**Example:**
+```python
+# Export conflict events in ACLED format
+response = requests.get(
+    "https://api.corpus.intrace.ai/v1/corpus/events/export",
+    headers={"X-API-Key": "your-api-key"},
+    params={
+        "format": "acled",
+        "event_category": "conflict",
+        "country": "Nigeria",
+        "date_from": "2026-01-01",
+        "date_to": "2026-01-31"
+    }
+)
+
+events = response.json()
+for event in events:
+    print(f"{event['event_date']}: {event['actor1']} vs {event['actor2']}")
+    if event['supporting_actor_1']:
+        print(f"  Supporting actor1: {event['supporting_actor_1']}")
+```
+
 ### Flat Format
 
-Denormalized JSON with one object per event-actor combination.
+Denormalized JSON with actor positions as explicit columns, suitable for spreadsheet import and tabular analysis.
 
 - **Use case**: Spreadsheet import where actor relationships need to be explicit
 - **File extension**: `.json`
 - **MIME type**: `application/json`
+
+**Actor Position Columns:**
+- `principalActor`, `secondaryActor`: Main actors
+- `principalActorCategory`, `secondaryActorCategory`: Actor categories (state_forces, rebel_group, etc.)
+- `subPrincipalActors`, `subSecondaryActors`: Internal sub-units (semicolon-separated)
+- `supportingPrincipalActor`, `supportingSecondaryActor`: External supporting actors (comma-separated)
+
+**Key Distinction:**
+- **Sub-actors**: Internal organizational units (e.g., "7th Division" within "Nigerian Army")
+- **Supporting actors**: External organizations providing support (e.g., "U.S. Special Forces" supporting "Colombian Army")
+
+**Example:**
+```python
+# Export in flat format for spreadsheet analysis
+response = requests.get(
+    "https://api.corpus.intrace.ai/v1/corpus/events/export",
+    headers={"X-API-Key": "your-api-key"},
+    params={
+        "format": "flat",
+        "event_category": "conflict",
+        "date_from": "2026-01-01"
+    }
+)
+
+events = response.json()
+for event in events:
+    print(f"Event: {event['title']}")
+    print(f"  Principal: {event['principalActor']} ({event['principalActorCategory']})")
+    if event['subPrincipalActors']:
+        print(f"    Internal units: {event['subPrincipalActors']}")
+    if event['supportingPrincipalActor']:
+        print(f"    External support: {event['supportingPrincipalActor']}")
+```
 
 ## Error Handling
 
@@ -451,7 +532,7 @@ Python error handling:
 ```python
 try:
     response = requests.get(
-        f"https://api.intrace.com/v1/corpus/events/{event_id}",
+        f"https://api.corpus.intrace.ai/v1/corpus/events/{event_id}",
         headers={"X-API-Key": api_key}
     )
     response.raise_for_status()

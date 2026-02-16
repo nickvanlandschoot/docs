@@ -154,7 +154,7 @@ The Organized Crime & Non-Political Violence category includes the following com
 import requests
 
 response = requests.get(
-    "https://api.intrace.com/v1/corpus/events",
+    "https://api.corpus.intrace.ai/v1/corpus/events",
     headers={"X-API-Key": "your-api-key"},
     params={"event_category": "organized_crime"}
 )
@@ -165,7 +165,7 @@ events = response.json()
 
 ```python
 response = requests.get(
-    "https://api.intrace.com/v1/corpus/events",
+    "https://api.corpus.intrace.ai/v1/corpus/events",
     headers={"X-API-Key": "your-api-key"},
     params={
         "event_category": "organized_crime",

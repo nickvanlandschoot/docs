@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://api.intrace.com",
+      "url": "https://api.corpus.intrace.ai",
       "description": "Production"
     },
     {

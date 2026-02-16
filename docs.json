@@ -1,5 +1,5 @@
 {
-  "$schema": "https://Intrace.com/docs.json",
+  "$schema": "https://mintlify.com/docs.json",
   "theme": "maple",
   "name": "Intrace Documentation",
   "colors": {
@@ -24,6 +24,10 @@
     }
   },
   "favicon": "/favicon.ico",
+  "modeToggle": {
+    "default": "dark",
+    "isHidden": true
+  },
   "navigation": {
     "tabs": [
       {
@@ -96,9 +100,7 @@
         ]
       }
     ],
-    "global": {
-
-    }
+    "global": {}
   },
   "logo": {
     "light": "/logo/light.svg",

@@ -4,3 +4,357 @@ api: "GET /v1/corpus/events/export"
 description: "Bulk export events in CSV, JSON, GeoJSON, ACLED, or flat format"
 ---
 
+Export events with optional filtering. Returns data in the specified format.
+
+## Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `format` | string | Yes | Export format: `csv`, `json`, `geojson`, `acled`, or `flat` |
+| `event_category` | string | No | Filter by event category |
+| `event_type` | string | No | Filter by event type within category |
+| `country` | string | No | Filter by country name |
+| `date_from` | string | No | Start date (YYYY-MM-DD, inclusive) |
+| `date_to` | string | No | End date (YYYY-MM-DD, inclusive) |
+| `search` | string | No | Full-text search across title and description |
+
+## Export Formats
+
+### CSV Format
+
+Standard comma-separated values with headers. Includes all event fields plus flattened actor information.
+
+**Use case:** Import into Excel, Google Sheets, or data analysis tools
+
+**Content-Type:** `text/csv; charset=utf-8`
+
+**File extension:** `.csv`
+
+**Example Request:**
+```bash
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/corpus/events/export?format=csv&event_category=conflict&country=Nigeria" \
+  -o events.csv
+```
+
+### JSON Format
+
+Array of complete `EventDetailResponse` objects with full metadata and nested actors.
+
+**Use case:** Programmatic processing, full data fidelity, custom analysis
+
+**Content-Type:** `application/json`
+
+**File extension:** `.json`
+
+**Response Structure:**
+```json
+[
+  {
+    "id": "ad8b3d2a-353f-41fd-908d-780615f31673",
+    "title": "Armed clash between government and rebel forces",
+    "description": "Detailed event description...",
+    "eventCategory": "conflict",
+    "eventType": "battles",
+    "eventSubtype": "armed_clash",
+    "eventDate": "2026-02-10",
+    "location": "Maiduguri",
+    "locationCountry": "NG",
+    "categorySpecificData": {
+      "disorder_type": "Political violence",
+      "fatalities": 15,
+      "injuries": 23,
+      "civilian_targeting": false
+    },
+    "actorRolesBreakdown": {
+      "perpetrator": ["Nigerian Army"],
+      "subject": ["Boko Haram"]
+    },
+    "salienceScore": 0.85,
+    "articleCount": 3,
+    "actorCount": 2,
+    "createdAt": "2026-02-10T14:30:00Z",
+    "updatedAt": "2026-02-10T14:30:00Z"
+  }
+]
+```
+
+### GeoJSON Format
+
+RFC 7946 compliant GeoJSON FeatureCollection suitable for mapping applications.
+
+**Use case:** Mapping applications, GIS tools, Leaflet, Mapbox, OpenLayers
+
+**Content-Type:** `application/geo+json`
+
+**File extension:** `.geojson`
+
+**Response Structure:**
+```json
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [13.4302, 11.8311]
+      },
+      "properties": {
+        "id": "ad8b3d2a-353f-41fd-908d-780615f31673",
+        "title": "Armed clash between government and rebel forces",
+        "event_category": "conflict",
+        "event_type": "battles",
+        "event_subtype": "armed_clash",
+        "event_date": "2026-02-10",
+        "location": "Maiduguri",
+        "location_country": "NG",
+        "salience_score": 0.85,
+        "fatalities": 15
+      }
+    }
+  ]
+}
+```
+
+**Example Request:**
+```bash
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/corpus/events/export?format=geojson&event_category=conflict&date_from=2026-01-01" \
+  -o conflict_map.geojson
+```
+
+### ACLED Format
+
+Compatible with ACLED (Armed Conflict Location & Event Data Project) schema. **Only available for conflict category events.**
+
+**Use case:** Integration with existing ACLED workflows, research tools expecting ACLED format
+
+**Content-Type:** `application/json`
+
+**File extension:** `.json`
+
+#### ACLED Field Mapping
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `event_id_cnty` | string | Event ID with country code prefix (e.g., "NGA12345678") |
+| `event_date` | string | Event date (YYYY-MM-DD) |
+| `year` | integer | Event year |
+| `time_precision` | integer | 1=day, 2=month, 3=year |
+| `disorder_type` | string | Disorder classification (e.g., "Political violence") |
+| `event_type` | string | ACLED event type (e.g., "Battles", "Violence against civilians") |
+| `sub_event_type` | string | ACLED sub-event type (e.g., "Armed clash", "Attack") |
+| `actor1` | string | Principal (primary) actor name |
+| `assoc_actor_1` | string | Internal sub-units of actor1, semicolon-separated |
+| `supporting_actor_1` | string | External supporting actors for actor1, comma-separated |
+| `inter1` | string | Inter-group code for actor1 (1=state, 2=rebel, 3=political militia, etc.) |
+| `actor2` | string | Secondary (opposing) actor name |
+| `assoc_actor_2` | string | Internal sub-units of actor2, semicolon-separated |
+| `supporting_actor_2` | string | External supporting actors for actor2, comma-separated |
+| `inter2` | string | Inter-group code for actor2 |
+| `interaction` | string | Interaction code combining inter1-inter2 (e.g., "1-2" for state vs rebel) |
+| `civilian_targeting` | string | "Civilians targeted" or empty |
+| `iso` | integer | ISO 3166-1 numeric country code |
+| `region` | string | ACLED region name |
+| `country` | string | Country name |
+| `admin1` | string | First-level administrative division |
+| `admin2` | string | Second-level administrative division |
+| `admin3` | string | Third-level administrative division |
+| `location` | string | Specific location name |
+| `latitude` | float | Latitude coordinate |
+| `longitude` | float | Longitude coordinate |
+| `geo_precision` | integer | Geographic precision level |
+| `source` | string | Source names, semicolon-separated |
+| `notes` | string | Event description/notes |
+| `fatalities` | integer | Number of reported fatalities |
+| `timestamp` | integer | Unix timestamp of event creation |
+
+**Additional Non-ACLED Fields:**
+- `salience_score`: Relevance/importance score (0.0-1.0)
+- `salience_rationale`: Explanation of salience score
+- `dedup_key`: Deduplication identifier
+- `event_date_end`: End date for multi-day events
+
+**Example Response:**
+```json
+[
+  {
+    "event_id_cnty": "NGA12345678",
+    "event_date": "2026-02-10",
+    "year": 2026,
+    "time_precision": 1,
+    "disorder_type": "Political violence",
+    "event_type": "Battles",
+    "sub_event_type": "Armed clash",
+    "actor1": "Nigerian Army",
+    "assoc_actor_1": "7th Division; 3rd Battalion",
+    "supporting_actor_1": "French Air Force, U.S. Military Advisors",
+    "inter1": "1",
+    "actor2": "Boko Haram",
+    "assoc_actor_2": "Shekau Faction",
+    "supporting_actor_2": null,
+    "inter2": "2",
+    "interaction": "1-2",
+    "civilian_targeting": "",
+    "iso": 566,
+    "region": "Western Africa",
+    "country": "Nigeria",
+    "admin1": "Borno",
+    "admin2": "Maiduguri",
+    "admin3": null,
+    "location": "Maiduguri",
+    "latitude": 11.8311,
+    "longitude": 13.4302,
+    "geo_precision": 1,
+    "source": "BBC News; Reuters",
+    "notes": "Clashes erupted between Nigerian military and insurgent forces...",
+    "fatalities": 15,
+    "timestamp": 1707577200,
+    "salience_score": 0.85,
+    "salience_rationale": "Significant engagement in ongoing conflict",
+    "dedup_key": "nigerian-army-boko-haram-maiduguri-clash",
+    "event_date_end": null
+  }
+]
+```
+
+**Example Request:**
+```bash
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/corpus/events/export?format=acled&event_category=conflict&country=Nigeria&date_from=2026-01-01&date_to=2026-01-31" \
+  -o nigeria_conflict_acled.json
+```
+
+### Flat Format
+
+Denormalized JSON with actor positions as explicit columns, suitable for spreadsheet import and tabular analysis.
+
+**Use case:** Spreadsheet import where actor relationships need to be explicit, business intelligence tools
+
+**Content-Type:** `application/json`
+
+**File extension:** `.json`
+
+#### Flat Format Actor Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `principalActor` | string | Principal (primary) actor name |
+| `principalActorCategory` | string | Category of principal (state_forces, rebel_group, etc.) |
+| `subPrincipalActors` | string | Internal sub-units of principal, semicolon-separated |
+| `supportingPrincipalActor` | string | External actors supporting principal, comma-separated |
+| `secondaryActor` | string | Secondary (opposing) actor name |
+| `secondaryActorCategory` | string | Category of secondary actor |
+| `subSecondaryActors` | string | Internal sub-units of secondary, semicolon-separated |
+| `supportingSecondaryActor` | string | External actors supporting secondary, comma-separated |
+
+**Example Response:**
+```json
+[
+  {
+    "id": "ad8b3d2a-353f-41fd-908d-780615f31673",
+    "investigationId": "f7e234a1-b456-4789-a012-3456789abcde",
+    "title": "Armed clash between Nigerian forces and insurgents",
+    "description": "Clashes erupted...",
+    "eventCategory": "conflict",
+    "eventType": "battles",
+    "eventSubtype": "armed_clash",
+    "eventDate": "2026-02-10",
+    "eventDateEnd": null,
+    "datePrecision": "day",
+    "location": "Maiduguri, Borno State",
+    "locationCountry": "NG",
+    "locationCoordinates": {
+      "lat": 11.8311,
+      "lng": 13.4302
+    },
+    "administrativeHierarchy": [
+      {"level": 1, "type": "state", "name": "Borno"},
+      {"level": 2, "type": "LGA", "name": "Maiduguri"}
+    ],
+    "categorySpecificData": {
+      "disorder_type": "Political violence",
+      "fatalities": 15,
+      "injuries": 23,
+      "civilian_targeting": false
+    },
+    "salienceScore": 0.85,
+    "principalActor": "Nigerian Army",
+    "principalActorCategory": "state_forces",
+    "subPrincipalActors": "7th Division; 3rd Battalion",
+    "supportingPrincipalActor": "French Air Force, U.S. Military Advisors",
+    "secondaryActor": "Boko Haram",
+    "secondaryActorCategory": "rebel_group",
+    "subSecondaryActors": "Shekau Faction",
+    "supportingSecondaryActor": null,
+    "createdAt": "2026-02-10T14:30:00Z",
+    "updatedAt": "2026-02-10T14:30:00Z"
+  }
+]
+```
+
+**Example Request:**
+```bash
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/corpus/events/export?format=flat&event_category=conflict&date_from=2026-01-01" \
+  -o events_flat.json
+```
+
+## Actor Position Hierarchy
+
+Understanding the actor position fields in ACLED and Flat formats:
+
+### Position Types
+
+1. **Principal/Secondary (actor1/actor2)**: Main actors in the event
+2. **Sub-Principal/Sub-Secondary (assoc_actor_1/assoc_actor_2)**: Internal organizational units
+   - Same organization as the main actor
+   - Examples: military divisions, regional branches, internal factions
+3. **Supporting Principal/Supporting Secondary (supporting_actor_1/supporting_actor_2)**: External support
+   - Different organizations providing assistance
+   - Examples: foreign military support, allied groups, coalition partners
+
+### Example Scenarios
+
+**Military operation with foreign support:**
+```
+actor1: "Nigerian Army"
+assoc_actor_1: "7th Division; 3rd Battalion"
+supporting_actor_1: "French Air Force, U.S. Military Advisors"
+```
+
+**Rebel coalition:**
+```
+actor1: "Free Syrian Army"
+assoc_actor_1: "Southern Front; Damascus Brigade"
+supporting_actor_1: "Turkish Armed Forces"
+
+actor2: "Syrian Arab Army"
+assoc_actor_2: "4th Armored Division; Republican Guard"
+supporting_actor_2: "Russian Aerospace Forces, Hezbollah"
+```
+
+## Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Success - returns data in requested format |
+| 400 | Bad Request - invalid format or filter parameters |
+| 401 | Unauthorized - missing or invalid API key |
+| 422 | Validation Error - filter values failed validation |
+| 500 | Server Error - contact support if persistent |
+
+## Rate Limits
+
+- **100 requests per minute** per API key
+- **10,000 requests per day** per API key
+
+Contact support for higher limits if needed for your use case.
+
+## See Also
+
+- [List Events](/api-reference/corpus/events/list-events) - Paginated event listing
+- [Get Event](/api-reference/corpus/events/get-event) - Single event details
+- [Data Models](/guides/corpus-api/taxonomy/data-models) - Complete field specifications
+- [Actor Types](/guides/corpus-api/taxonomy/actor-types) - Actor classification reference

@@ -17,61 +17,60 @@ The standard event object returned by list endpoints.
 |-------|------|-------------|
 | `id` | UUID | Unique event identifier |
 | `title` | string | Event title/headline |
-| `description` | string | Detailed event description |
-| `event_date` | date | Date when the event occurred (YYYY-MM-DD) |
-| `event_category` | string | Category ID (e.g., "conflict", "cyber") |
-| `event_type` | string | Type ID within category |
-| `event_subtype` | string | Subtype ID within type |
-| `country` | string | Country where event occurred |
-| `location` | string | Specific location/city |
-| `latitude` | float | Latitude coordinate (nullable) |
-| `longitude` | float | Longitude coordinate (nullable) |
-| `source_url` | string | URL to source article (nullable) |
-| `created_at` | datetime | When record was created |
+| `description` | string | Detailed event description (nullable) |
+| `eventCategory` | string | Category ID (e.g., "conflict", "cyber") |
+| `eventType` | string | Type ID within category |
+| `eventSubtype` | string | Subtype ID within type (nullable) |
+| `eventDate` | date | Date when the event occurred, YYYY-MM-DD (nullable) |
+| `eventDateEnd` | date | End date for multi-day events (nullable) |
+| `location` | string | Specific location name (nullable) |
+| `locationCountry` | string | ISO country code (nullable) |
+| `locationCoordinates` | object | Coordinates object with `lat` and `lng` (nullable) |
+| `salienceScore` | float | Relevance/importance score (nullable) |
+| `articleCount` | integer | Number of source articles |
+| `actorCount` | integer | Number of actors involved |
+| `sourceDomains` | string[] | List of source domain URLs (nullable) |
+| `createdAt` | datetime | When record was created |
+| `updatedAt` | datetime | When record was last updated |
 
 ### Example JSON
 
 ```json
 {
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "title": "Cyber attack targets financial institutions",
-  "description": "A sophisticated ransomware attack affected multiple banks...",
-  "event_date": "2026-02-15",
-  "event_category": "cyber",
-  "event_type": "cyber_attack",
-  "event_subtype": "ransomware",
-  "country": "United States",
-  "location": "New York",
-  "latitude": 40.7128,
-  "longitude": -74.0060,
-  "source_url": "https://example.com/article",
-  "created_at": "2026-02-15T14:30:00Z"
+  "id": "ad8b3d2a-353f-41fd-908d-780615f31673",
+  "title": "353 killed, 60 kidnapped in violent attacks across Nigeria in June",
+  "description": "A total of 353 people were killed and 60 were kidnapped in violent attacks across Nigeria in June.",
+  "eventCategory": "crime",
+  "eventType": "violence",
+  "eventSubtype": null,
+  "eventDate": "2026-06-01",
+  "eventDateEnd": null,
+  "location": "Nigeria",
+  "locationCountry": "NG",
+  "locationCoordinates": null,
+  "salienceScore": null,
+  "articleCount": 0,
+  "actorCount": 0,
+  "sourceDomains": null,
+  "createdAt": "2026-02-13T22:29:32.845037Z",
+  "updatedAt": "2026-02-13T22:29:32.845037Z"
 }
 ```
 
 ## EventDetailResponse
 
-Extended event object with actors and category-specific metadata.
+Extended event object with category-specific data.
 
 Includes all fields from `EventResponse` plus:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `actors` | ActorInEvent[] | List of actors involved in the event |
-| `metadata` | object | Category-specific metadata fields |
+| `categorySpecificData` | object | Category-specific metadata fields (nullable) |
+| `actorRolesBreakdown` | object | Breakdown of actors by role (nullable) |
 
-### ActorInEvent Structure
+### Category-Specific Data
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | UUID | Actor unique identifier |
-| `canonical_name` | string | Actor's canonical name |
-| `actor_type` | string | Actor type classification |
-| `position` | string | Actor's role: PRINCIPAL, SECONDARY, SUB_PRINCIPAL, SUB_SECONDARY, SUPPORTING_PRINCIPAL, SUPPORTING_SECONDARY |
-
-### Metadata by Category
-
-The `metadata` field contains category-specific fields. See each category's taxonomy page for field definitions.
+The `categorySpecificData` field contains metadata fields defined by the event's category. See each category's taxonomy page for the specific fields available.
 
 **Example for Conflict event:**
 
@@ -79,29 +78,30 @@ The `metadata` field contains category-specific fields. See each category's taxo
 {
   "id": "...",
   "title": "Armed clash between government and rebel forces",
-  "event_category": "conflict",
-  "event_type": "battles",
-  "event_subtype": "armed_clash",
-  "actors": [
-    {
-      "id": "actor-uuid-1",
-      "canonical_name": "National Army",
-      "actor_type": "military",
-      "position": "PRINCIPAL"
-    },
-    {
-      "id": "actor-uuid-2",
-      "canonical_name": "Rebel Group X",
-      "actor_type": "rebel_group",
-      "position": "SECONDARY"
-    }
-  ],
-  "metadata": {
+  "eventCategory": "conflict",
+  "eventType": "battles",
+  "eventSubtype": "armed_clash",
+  "eventDate": "2026-02-10",
+  "eventDateEnd": null,
+  "location": "Donetsk",
+  "locationCountry": "UA",
+  "locationCoordinates": {
+    "lat": 48.0159,
+    "lng": 37.8029
+  },
+  "salienceScore": 0.85,
+  "articleCount": 3,
+  "actorCount": 2,
+  "sourceDomains": ["reuters.com", "bbc.co.uk"],
+  "createdAt": "2026-02-10T14:30:00Z",
+  "updatedAt": "2026-02-10T14:30:00Z",
+  "categorySpecificData": {
     "disorder_type": "Political violence",
     "fatalities": 15,
     "injuries": 23,
     "civilian_targeting": false
-  }
+  },
+  "actorRolesBreakdown": null
 }
 ```
 
@@ -114,34 +114,52 @@ The standard actor object returned by list endpoints.
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | UUID | Unique actor identifier |
-| `canonical_name` | string | Actor's canonical/standardized name |
-| `actor_type` | string | Actor type classification |
+| `canonicalName` | string | Actor's canonical/standardized name |
 | `aliases` | string[] | Alternative names/spellings (nullable) |
-| `created_at` | datetime | When record was created |
+| `description` | string | Description of the actor (nullable) |
+| `articleCount` | integer | Number of articles mentioning this actor |
+| `eventCount` | integer | Number of events involving this actor |
+| `sourceDomains` | string[] | List of source domains (nullable) |
+| `firstMentionDate` | date | Date of first mention (nullable) |
+| `lastMentionDate` | date | Date of most recent mention (nullable) |
+| `createdAt` | datetime | When record was created |
+| `updatedAt` | datetime | When record was last updated |
+
+**Note:** The actor type/category is not included in the response object. To filter actors by type, use the `actor_type` query parameter when calling `/v1/corpus/actors`, and use the `/v1/corpus/metadata/actor-types` endpoint to discover available types.
 
 ### Example JSON
 
 ```json
 {
-  "id": "660e8400-e29b-41d4-a716-446655440000",
-  "canonical_name": "National Liberation Front",
-  "actor_type": "rebel_group",
-  "aliases": ["NLF", "Liberation Front"],
-  "created_at": "2026-01-10T09:00:00Z"
+  "id": "5a9c2a21-e326-4563-b425-a6490d4ccbe0",
+  "canonicalName": "3M",
+  "aliases": null,
+  "description": "The mention of '3M' refers to the corporation, a large multinational conglomerate known for its diverse range of products.",
+  "articleCount": 6,
+  "eventCount": 0,
+  "sourceDomains": [
+    "www.boston25news.com",
+    "www.facebook.com",
+    "www.kimt.com",
+    "www.local10.com"
+  ],
+  "firstMentionDate": null,
+  "lastMentionDate": null,
+  "createdAt": "2026-02-04T00:26:46.088359Z",
+  "updatedAt": "2026-02-04T00:28:15.278086Z"
 }
 ```
 
 ## ActorDetailResponse
 
-Extended actor object with statistics and relationships.
+Extended actor object with relationship breakdowns.
 
 Includes all fields from `ActorResponse` plus:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `event_count` | integer | Number of events this actor is involved in |
-| `first_event_date` | date | Date of first associated event (nullable) |
-| `last_event_date` | date | Date of most recent event (nullable) |
+| `eventTypesBreakdown` | object | Breakdown of events by type (nullable) |
+| `rolesBreakdown` | object | Breakdown of actor roles across events (nullable) |
 
 ## PaginatedEventsResponse
 
@@ -152,18 +170,18 @@ Wrapper for paginated event listings.
 | `items` | EventResponse[] | Array of events |
 | `total` | integer | Total number of matching events |
 | `page` | integer | Current page number |
-| `page_size` | integer | Number of items per page |
-| `total_pages` | integer | Total number of pages |
+| `pageSize` | integer | Number of items per page |
+| `totalPages` | integer | Total number of pages |
 
 ### Example JSON
 
 ```json
 {
   "items": [...],
-  "total": 1234,
+  "total": 49,
   "page": 1,
-  "page_size": 50,
-  "total_pages": 25
+  "pageSize": 50,
+  "totalPages": 1
 }
 ```
 
@@ -178,7 +196,7 @@ Country with event count.
 | Field | Type | Description |
 |-------|------|-------------|
 | `country` | string | Country name |
-| `event_count` | integer | Number of events in this country |
+| `eventCount` | integer | Number of events in this country |
 
 ## RegionAggregation
 
@@ -187,8 +205,8 @@ Location/region with event count.
 | Field | Type | Description |
 |-------|------|-------------|
 | `location` | string | City/region name |
-| `country` | string | Country name |
-| `event_count` | integer | Number of events in this location |
+| `country` | string | Country name (nullable) |
+| `eventCount` | integer | Number of events in this location |
 
 ## MetadataValueCount
 
@@ -244,10 +262,90 @@ Geographic data format suitable for mapping applications:
 
 ### ACLED Format
 
-Compatible with ACLED (Armed Conflict Location & Event Data Project) schema.
+Compatible with ACLED (Armed Conflict Location & Event Data Project) schema. Only available for conflict category events.
+
+#### Key Actor Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `actor1` | string | Principal (primary) actor in the conflict event |
+| `assoc_actor_1` | string | Associated actors (internal sub-units of actor1), semicolon-separated |
+| `supporting_actor_1` | string | External supporting actors for actor1, comma-separated |
+| `inter1` | string | Inter-group code for actor1 (1=state, 2=rebel, 3=political militia, etc.) |
+| `actor2` | string | Secondary (opposing) actor in the conflict event |
+| `assoc_actor_2` | string | Associated actors (internal sub-units of actor2), semicolon-separated |
+| `supporting_actor_2` | string | External supporting actors for actor2, comma-separated |
+| `inter2` | string | Inter-group code for actor2 |
+| `interaction` | string | Interaction code combining inter1 and inter2 (e.g., "1-2" for state vs rebel) |
+
+**Example:**
+```json
+{
+  "event_id_cnty": "NGA12345678",
+  "event_date": "2026-02-10",
+  "event_type": "Battles",
+  "sub_event_type": "Armed clash",
+  "actor1": "Nigerian Army",
+  "assoc_actor_1": "7th Division; 3rd Battalion",
+  "supporting_actor_1": "French Air Force, U.S. Military Advisors",
+  "inter1": "1",
+  "actor2": "Boko Haram",
+  "assoc_actor_2": "Shekau Faction",
+  "supporting_actor_2": null,
+  "inter2": "2",
+  "interaction": "1-2",
+  "location": "Maiduguri",
+  "country": "Nigeria",
+  "fatalities": 15
+}
+```
 
 ### Flat Format
 
-Denormalized JSON with one object per event-actor combination, suitable for spreadsheet import.
+Denormalized JSON with actor positions as explicit columns, suitable for spreadsheet import and tabular analysis.
+
+#### Actor Position Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `principalActor` | string | Principal (primary) actor name |
+| `principalActorCategory` | string | Category of principal actor (state_forces, rebel_group, etc.) |
+| `subPrincipalActors` | string | Internal sub-units of principal actor, semicolon-separated |
+| `supportingPrincipalActor` | string | External actors supporting principal, comma-separated |
+| `secondaryActor` | string | Secondary (opposing) actor name |
+| `secondaryActorCategory` | string | Category of secondary actor |
+| `subSecondaryActors` | string | Internal sub-units of secondary actor, semicolon-separated |
+| `supportingSupportingActor` | string | External actors supporting secondary, comma-separated |
+
+**Actor Position Hierarchy:**
+
+- **Principal/Secondary**: Main actors in the event (actor1/actor2 in ACLED)
+- **Sub-Principal/Sub-Secondary**: Internal sub-units, factions, or branches within the same organization (e.g., "3rd Battalion" within "Nigerian Army")
+- **Supporting Principal/Supporting Secondary**: External organizations providing support (e.g., "U.S. Special Forces" providing training to "Colombian Army")
+
+**Example:**
+```json
+{
+  "id": "ad8b3d2a-353f-41fd-908d-780615f31673",
+  "title": "Armed clash between Nigerian forces and insurgents",
+  "eventCategory": "conflict",
+  "eventType": "battles",
+  "eventSubtype": "armed_clash",
+  "eventDate": "2026-02-10",
+  "location": "Maiduguri, Borno State",
+  "locationCountry": "NG",
+  "principalActor": "Nigerian Army",
+  "principalActorCategory": "state_forces",
+  "subPrincipalActors": "7th Division; 3rd Battalion",
+  "supportingPrincipalActor": "French Air Force, U.S. Military Advisors",
+  "secondaryActor": "Boko Haram",
+  "secondaryActorCategory": "rebel_group",
+  "subSecondaryActors": "Shekau Faction",
+  "supportingSecondaryActor": null,
+  "salienceScore": 0.85,
+  "createdAt": "2026-02-10T14:30:00Z",
+  "updatedAt": "2026-02-10T14:30:00Z"
+}
+```
 
 [← Back to Taxonomy Overview](/guides/corpus-api/taxonomy)

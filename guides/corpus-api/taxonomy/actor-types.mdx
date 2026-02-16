@@ -5,7 +5,7 @@ description: "Complete list of actor type values in the Intrace Corpus"
 
 # Actor Types
 
-The Intrace Corpus classifies actors into distinct types to enable precise filtering and analysis. Each actor in the system has an `actor_type` field that indicates their classification.
+The Intrace Corpus classifies actors into distinct types to enable precise filtering and analysis. Actor types are used as query parameters to filter results when listing actors.
 
 ## Overview
 
@@ -31,7 +31,7 @@ import requests
 
 # Get all government actors
 response = requests.get(
-    "https://api.intrace.com/v1/corpus/actors",
+    "https://api.corpus.intrace.ai/v1/corpus/actors",
     headers={"X-API-Key": "your-api-key"},
     params={"actor_type": "state_government"}
 )
@@ -44,7 +44,7 @@ Use the metadata endpoint to see all actor types currently in the corpus:
 ```python
 # Get all actor types with counts
 response = requests.get(
-    "https://api.intrace.com/v1/corpus/metadata/actor-types",
+    "https://api.corpus.intrace.ai/v1/corpus/metadata/actor-types",
     headers={"X-API-Key": "your-api-key"}
 )
 actor_types = response.json()
@@ -113,14 +113,63 @@ The following actor types are commonly found in the corpus. Use the metadata end
 
 ## Actor Hierarchy
 
-Some events may involve multiple actors in different roles:
+Events, particularly conflict events, often involve multiple actors in different hierarchical positions. The Corpus API distinguishes between internal organizational units and external supporting actors:
 
-- **Principal**: Primary actor in the event
-- **Secondary**: Secondary or opposing actor
-- **Sub-Principal/Sub-Secondary**: Internal units of the main actors
-- **Supporting Principal/Supporting Secondary**: External actors providing support
+### Position Types
 
-See the [Event Data Models](/guides/corpus-api/taxonomy/data-models) page for details on actor positions in events.
+- **Principal**: Primary actor in the event (mapped to `actor1` in ACLED format)
+- **Secondary**: Secondary or opposing actor (mapped to `actor2` in ACLED format)
+- **Sub-Principal/Sub-Secondary**: Internal sub-units, factions, or branches within the same organization
+- **Supporting Principal/Supporting Secondary**: External actors from different organizations providing support
+
+### Key Distinction: Internal vs External
+
+**Internal Sub-Actors (sub_principal/sub_secondary):**
+- Part of the same organization as the main actor
+- Examples: military divisions, battalions, regional branches, factions within a group
+- Use case: "Nigerian Army" (principal) with "7th Division" and "3rd Battalion" as sub-principal actors
+
+**External Supporting Actors (supporting_principal/supporting_secondary):**
+- Separate organizations providing support to the main actor
+- Examples: foreign military support, allied groups, coalition partners
+- Use case: "Colombian Army" (principal) with "U.S. Special Forces" as supporting_principal providing training
+
+### Examples
+
+**Example 1: Military operation with foreign support**
+```
+Principal: Nigerian Army
+Sub-Principal: 7th Division, 3rd Battalion
+Supporting Principal: French Air Force, U.S. Military Advisors
+
+Secondary: Boko Haram
+Sub-Secondary: Shekau Faction
+Supporting Secondary: null
+```
+
+**Example 2: Rebel coalition**
+```
+Principal: Free Syrian Army
+Sub-Principal: Southern Front, Damascus Brigade
+Supporting Principal: Turkish Armed Forces
+
+Secondary: Syrian Arab Army
+Sub-Secondary: 4th Armored Division, Republican Guard
+Supporting Secondary: Russian Aerospace Forces, Hezbollah
+```
+
+**Example 3: Inter-cartel violence**
+```
+Principal: Sinaloa Cartel
+Sub-Principal: Los Chapitos Faction
+Supporting Principal: null
+
+Secondary: Jalisco New Generation Cartel
+Sub-Secondary: Elite Group
+Supporting Secondary: null
+```
+
+See the [Event Data Models](/guides/corpus-api/taxonomy/data-models) page for complete field specifications and export format details.
 
 ## Filtering Events by Actor Type
 
@@ -132,7 +181,7 @@ You cannot directly filter events by actor type through the events endpoint, but
 ```python
 # Step 1: Find all rebel group actors
 actors_response = requests.get(
-    "https://api.intrace.com/v1/corpus/actors",
+    "https://api.corpus.intrace.ai/v1/corpus/actors",
     headers={"X-API-Key": "your-api-key"},
     params={"actor_type": "rebel_group"}
 )
@@ -141,7 +190,7 @@ actors = actors_response.json()["items"]
 # Step 2: Get events for a specific actor
 for actor in actors:
     events_response = requests.get(
-        f"https://api.intrace.com/v1/corpus/actors/{actor['id']}/events",
+        f"https://api.corpus.intrace.ai/v1/corpus/actors/{actor['id']}/events",
         headers={"X-API-Key": "your-api-key"}
     )
     events = events_response.json()

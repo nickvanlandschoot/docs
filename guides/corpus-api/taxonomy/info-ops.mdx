@@ -158,7 +158,7 @@ The Information Operations & Influence category includes the following complete 
 import requests
 
 response = requests.get(
-    "https://api.intrace.com/v1/corpus/events",
+    "https://api.corpus.intrace.ai/v1/corpus/events",
     headers={"X-API-Key": "your-api-key"},
     params={"event_category": "info_ops"}
 )
@@ -169,7 +169,7 @@ events = response.json()
 
 ```python
 response = requests.get(
-    "https://api.intrace.com/v1/corpus/events",
+    "https://api.corpus.intrace.ai/v1/corpus/events",
     headers={"X-API-Key": "your-api-key"},
     params={
         "event_category": "info_ops",
