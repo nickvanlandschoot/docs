@@ -1,86 +1,103 @@
 {
-  "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
+  "$schema": "https://Intrace.com/docs.json",
+  "theme": "maple",
+  "name": "Intrace Documentation",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#A60005",
+    "light": "#D4343A",
+    "dark": "#A60005"
   },
-  "favicon": "/favicon.svg",
+  "background": {
+    "color": {
+      "light": "#ffffff",
+      "dark": "#09090B"
+    }
+  },
+  "fonts": {
+    "heading": {
+      "family": "Inter",
+      "weight": 400
+    },
+    "body": {
+      "family": "Inter",
+      "weight": 400
+    }
+  },
+  "favicon": "/favicon.ico",
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "GET STARTED",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
+              "guides/corpus-api/integration-guide"
             ]
           },
           {
-            "group": "Customization",
+            "group": "EVENT TAXONOMY",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
+              "guides/corpus-api/taxonomy/index",
+              "guides/corpus-api/taxonomy/conflict",
+              "guides/corpus-api/taxonomy/crime",
+              "guides/corpus-api/taxonomy/corporate",
+              "guides/corpus-api/taxonomy/political",
+              "guides/corpus-api/taxonomy/cyber",
+              "guides/corpus-api/taxonomy/climate",
+              "guides/corpus-api/taxonomy/organized-crime",
+              "guides/corpus-api/taxonomy/info-ops"
             ]
           },
           {
-            "group": "Writing content",
+            "group": "REFERENCE",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "guides/corpus-api/taxonomy/actor-types",
+              "guides/corpus-api/taxonomy/data-models"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "API Reference",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "EVENTS",
             "pages": [
-              "api-reference/introduction"
+              "api-reference/corpus/events/list-events",
+              "api-reference/corpus/events/get-event",
+              "api-reference/corpus/events/export-events"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "ACTORS",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/corpus/actors/list-actors",
+              "api-reference/corpus/actors/get-actor",
+              "api-reference/corpus/actors/list-actor-events"
+            ]
+          },
+          {
+            "group": "LOCATIONS",
+            "pages": [
+              "api-reference/corpus/locations/list-countries",
+              "api-reference/corpus/locations/list-regions"
+            ]
+          },
+          {
+            "group": "METADATA",
+            "pages": [
+              "api-reference/corpus/metadata/event-categories",
+              "api-reference/corpus/metadata/event-types",
+              "api-reference/corpus/metadata/event-subtypes",
+              "api-reference/corpus/metadata/actor-types"
             ]
           }
         ]
       }
     ],
     "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
+
     }
   },
   "logo": {
@@ -91,32 +108,19 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:team@intrace.com"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "href": "https://app.intrace.ai"
     }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/intraceai",
+      "linkedin": "https://linkedin.com/company/intraceai"
     }
   }
 }

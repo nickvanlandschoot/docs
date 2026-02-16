@@ -1,0 +1,188 @@
+---
+title: "Organized Crime & Non-Political Violence Taxonomy"
+description: "Complete event type and subtype reference for Organized Crime & Non-Political Violence"
+---
+
+# Organized Crime & Non-Political Violence
+
+**Category ID**: `organized_crime`
+**Icon**: skull
+**Color**: #B91C1C
+
+This category contains **6 event types** and **28 subtypes** for tracking organized crime & non-political violence events.
+
+## Special Fields
+
+This category includes the following specialized metadata fields:
+
+| Field | Type | Required | Options |
+|-------|------|----------|----------|
+| `organization_type` | string | Yes | 7 values (see below) |
+| `activity_domain` | string | No | 7 values (see below) |
+| `fatalities` | integer | No |  |
+| `suspects_identified` | boolean | No |  |
+| `law_enforcement_response` | string | No | 5 values (see below) |
+
+### Organization Type
+
+**Field ID**: `organization_type`  
+**Type**: string  
+**Required**: Yes  
+
+**Allowed values**:
+- `Cartel`
+- `Gang`
+- `Mafia`
+- `Militia`
+- `Paramilitary`
+- `Syndicate`
+- `Unknown`
+
+### Activity Domain
+
+**Field ID**: `activity_domain`  
+**Type**: string  
+**Required**: No  
+
+**Allowed values**:
+- `Drug trafficking`
+- `Arms trafficking`
+- `Human trafficking`
+- `Extortion`
+- `Smuggling`
+- `Contract killing`
+- `Territory control`
+
+### Fatalities
+
+**Field ID**: `fatalities`  
+**Type**: integer  
+**Required**: No  
+
+### Suspects Identified
+
+**Field ID**: `suspects_identified`  
+**Type**: boolean  
+**Required**: No  
+
+### Law Enforcement Response
+
+**Field ID**: `law_enforcement_response`  
+**Type**: string  
+**Required**: No  
+
+**Allowed values**:
+- `None`
+- `Investigation`
+- `Raid`
+- `Arrests`
+- `Military deployment`
+
+## Event Type Hierarchy
+
+The Organized Crime & Non-Political Violence category includes the following complete hierarchy:
+
+### Drug War Violence
+
+**Type ID**: `drug_war_violence`  
+**Subtypes**: 5
+
+- **Cartel On Cartel Clash** (`cartel_on_cartel_clash`)
+- **Cartel Vs State Engagement** (`cartel_vs_state_engagement`)
+- **Drug Lab Raid** (`drug_lab_raid`)
+- **Narco Blockade** (`narco_blockade`)
+- **Forced Recruitment** (`forced_recruitment`)
+
+### Trafficking Operation
+
+**Type ID**: `trafficking_operation`  
+**Subtypes**: 4
+
+- **Human Trafficking** (`human_trafficking`)
+- **Arms Trafficking** (`arms_trafficking`)
+- **Drug Shipment Interdiction** (`drug_shipment_interdiction`)
+- **Smuggling Route Disruption** (`smuggling_route_disruption`)
+
+### Gang Activity
+
+**Type ID**: `gang_activity`  
+**Subtypes**: 5
+
+- **Turf War** (`turf_war`)
+- **Gang Related Homicide** (`gang_related_homicide`)
+- **Extortion Racket** (`extortion_racket`)
+- **Drive By Shooting** (`drive_by_shooting`)
+- **Initiation Violence** (`initiation_violence`)
+
+### Organized Crime Enforcement
+
+**Type ID**: `organized_crime_enforcement`  
+**Subtypes**: 5
+
+- **Kingpin Arrest** (`kingpin_arrest`)
+- **Asset Seizure** (`asset_seizure`)
+- **Extradition Operation** (`extradition_operation`)
+- **Witness Protection Event** (`witness_protection_event`)
+- **Informant Assassination** (`informant_assassination`)
+
+### Mafia And Syndicate Activity
+
+**Type ID**: `mafia_and_syndicate_activity`  
+**Subtypes**: 5
+
+- **Contract Killing** (`contract_killing`)
+- **Protection Racket** (`protection_racket`)
+- **Money Laundering Operation** (`money_laundering_operation`)
+- **Infiltration Of Legitimate Business** (`infiltration_of_legitimate_business`)
+- **Internal Power Struggle** (`internal_power_struggle`)
+
+### Kidnapping And Ransom
+
+**Type ID**: `kidnapping_and_ransom`  
+**Subtypes**: 4
+
+- **Express Kidnapping** (`express_kidnapping`)
+- **Ransom Negotiation** (`ransom_negotiation`)
+- **Hostage Rescue** (`hostage_rescue`)
+- **Mass Abduction** (`mass_abduction`)
+
+## Example API Queries
+
+### Get all Organized Crime & Non-Political Violence events
+
+```python
+import requests
+
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params={"event_category": "organized_crime"}
+)
+events = response.json()
+```
+
+### Get Drug War Violence events
+
+```python
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params={
+        "event_category": "organized_crime",
+        "event_type": "drug_war_violence"
+    }
+)
+```
+
+## Conceptual Guidance
+
+Organized crime events distinguish between:
+
+- **Drug War Violence**: Cartel and gang conflicts
+- **Trafficking Operations**: Movement of illicit goods/people
+- **Gang Activity**: Street gang operations
+- **Mafia & Syndicate Activity**: Traditional organized crime
+
+Use **law_enforcement_response** to indicate intervention level.
+
+[← Back to Taxonomy Overview](/guides/corpus-api/taxonomy)

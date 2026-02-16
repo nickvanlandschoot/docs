@@ -1,0 +1,199 @@
+---
+title: "Climate & Environmental Crisis Taxonomy"
+description: "Complete event type and subtype reference for Climate & Environmental Crisis"
+---
+
+# Climate & Environmental Crisis
+
+**Category ID**: `climate`
+**Icon**: cloud-rain
+**Color**: #059669
+
+This category contains **7 event types** and **37 subtypes** for tracking climate & environmental crisis events.
+
+## Special Fields
+
+This category includes the following specialized metadata fields:
+
+| Field | Type | Required | Options |
+|-------|------|----------|----------|
+| `hazard_type` | string | Yes | 6 values (see below) |
+| `severity` | string | Yes | 5 values (see below) |
+| `fatalities` | integer | No |  |
+| `displaced_persons` | integer | No |  |
+| `estimated_damage_usd` | float | No |  |
+| `affected_area_km2` | float | No |  |
+
+### Hazard Type
+
+**Field ID**: `hazard_type`  
+**Type**: string  
+**Required**: Yes  
+
+**Allowed values**:
+- `Meteorological`
+- `Geophysical`
+- `Hydrological`
+- `Climatological`
+- `Biological`
+- `Industrial/Technological`
+
+### Severity
+
+**Field ID**: `severity`  
+**Type**: string  
+**Required**: Yes  
+
+**Allowed values**:
+- `Advisory`
+- `Watch`
+- `Warning`
+- `Emergency`
+- `Catastrophic`
+
+### Fatalities
+
+**Field ID**: `fatalities`  
+**Type**: integer  
+**Required**: No  
+
+### Displaced Persons
+
+**Field ID**: `displaced_persons`  
+**Type**: integer  
+**Required**: No  
+
+### Estimated Damage Usd
+
+**Field ID**: `estimated_damage_usd`  
+**Type**: float  
+**Required**: No  
+
+### Affected Area Km2
+
+**Field ID**: `affected_area_km2`  
+**Type**: float  
+**Required**: No  
+
+## Event Type Hierarchy
+
+The Climate & Environmental Crisis category includes the following complete hierarchy:
+
+### Natural Disaster
+
+**Type ID**: `natural_disaster`  
+**Subtypes**: 7
+
+- **Earthquake** (`earthquake`)
+- **Volcanic Eruption** (`volcanic_eruption`)
+- **Tsunami** (`tsunami`)
+- **Hurricane Typhoon Cyclone** (`hurricane_typhoon_cyclone`)
+- **Tornado** (`tornado`)
+- **Flood** (`flood`)
+- **Landslide** (`landslide`)
+
+### Climate Driven Crisis
+
+**Type ID**: `climate_driven_crisis`  
+**Subtypes**: 5
+
+- **Drought** (`drought`)
+- **Wildfire** (`wildfire`)
+- **Extreme Heat Event** (`extreme_heat_event`)
+- **Glacial Lake Outburst** (`glacial_lake_outburst`)
+- **Sea Level Inundation** (`sea_level_inundation`)
+
+### Environmental Degradation
+
+**Type ID**: `environmental_degradation`  
+**Subtypes**: 7
+
+- **Deforestation** (`deforestation`)
+- **Desertification** (`desertification`)
+- **Coral Reef Collapse** (`coral_reef_collapse`)
+- **Biodiversity Loss Event** (`biodiversity_loss_event`)
+- **Soil Contamination** (`soil_contamination`)
+- **Air Pollution Event** (`air_pollution_event`)
+- **Water Pollution Event** (`water_pollution_event`)
+
+### Industrial Environmental Disaster
+
+**Type ID**: `industrial_environmental_disaster`  
+**Subtypes**: 5
+
+- **Oil Spill** (`oil_spill`)
+- **Chemical Release** (`chemical_release`)
+- **Nuclear Incident** (`nuclear_incident`)
+- **Mining Disaster** (`mining_disaster`)
+- **Dam Failure** (`dam_failure`)
+
+### Resource Conflict
+
+**Type ID**: `resource_conflict`  
+**Subtypes**: 4
+
+- **Water Scarcity Dispute** (`water_scarcity_dispute`)
+- **Land Use Conflict** (`land_use_conflict`)
+- **Fishing Rights Dispute** (`fishing_rights_dispute`)
+- **Mining Rights Conflict** (`mining_rights_conflict`)
+
+### Climate Policy And Response
+
+**Type ID**: `climate_policy_and_response`  
+**Subtypes**: 4
+
+- **Climate Agreement** (`climate_agreement`)
+- **Emissions Regulation** (`emissions_regulation`)
+- **Disaster Relief Deployment** (`disaster_relief_deployment`)
+- **Environmental Protest** (`environmental_protest`)
+
+### Biological Hazard
+
+**Type ID**: `biological_hazard`  
+**Subtypes**: 5
+
+- **Pandemic** (`pandemic`)
+- **Disease Outbreak** (`disease_outbreak`)
+- **Epidemic** (`epidemic`)
+- **Vector Borne Disease Spread** (`vector_borne_disease_spread`)
+- **Zoonotic Spillover** (`zoonotic_spillover`)
+
+## Example API Queries
+
+### Get all Climate & Environmental Crisis events
+
+```python
+import requests
+
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params={"event_category": "climate"}
+)
+events = response.json()
+```
+
+### Get Natural Disaster events
+
+```python
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params={
+        "event_category": "climate",
+        "event_type": "natural_disaster"
+    }
+)
+```
+
+## Conceptual Guidance
+
+Climate events use scientific hazard classification:
+
+- **hazard_type** follows international standards (Meteorological, Geophysical, etc.)
+- **severity** indicates immediate danger level
+- Impact metrics: **fatalities**, **displaced_persons**, **estimated_damage_usd**
+
+**Natural Disaster** vs **Climate Driven Crisis**: Acute events vs slow-onset phenomena.
+
+[← Back to Taxonomy Overview](/guides/corpus-api/taxonomy)

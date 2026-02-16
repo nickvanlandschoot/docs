@@ -1,0 +1,160 @@
+---
+title: "Conflict & Crisis Taxonomy"
+description: "Complete event type and subtype reference for Conflict & Crisis"
+---
+
+# Conflict & Crisis
+
+**Category ID**: `conflict`
+**Icon**: shield-alert
+**Color**: #DC2626
+
+This category contains **5 event types** and **25 subtypes** for tracking conflict & crisis events.
+
+## Special Fields
+
+This category includes the following specialized metadata fields:
+
+| Field | Type | Required | Options |
+|-------|------|----------|----------|
+| `disorder_type` | string | Yes | `Political violence`, `Demonstrations`, `Strategic developments` |
+| `fatalities` | integer | No |  |
+| `injuries` | integer | No |  |
+| `abductions` | integer | No |  |
+| `civilian_targeting` | boolean | No |  |
+
+### Disorder Type
+
+**Field ID**: `disorder_type`  
+**Type**: string  
+**Required**: Yes  
+
+**Allowed values**:
+- `Political violence`
+- `Demonstrations`
+- `Strategic developments`
+
+### Fatalities
+
+**Field ID**: `fatalities`  
+**Type**: integer  
+**Required**: No  
+
+### Injuries
+
+**Field ID**: `injuries`  
+**Type**: integer  
+**Required**: No  
+
+### Abductions
+
+**Field ID**: `abductions`  
+**Type**: integer  
+**Required**: No  
+
+### Civilian Targeting
+
+**Field ID**: `civilian_targeting`  
+**Type**: boolean  
+**Required**: No  
+
+## Event Type Hierarchy
+
+The Conflict & Crisis category includes the following complete hierarchy:
+
+### Battles
+
+**Type ID**: `battles`  
+**Subtypes**: 3
+
+- **Government Regains Territory** (`government_regains_territory`)
+- **Non State Actor Overtakes Territory** (`non_state_actor_overtakes_territory`)
+- **Armed Clash** (`armed_clash`)
+
+### Civil Unrest
+
+**Type ID**: `civil_unrest`  
+**Subtypes**: 5
+
+- **Peaceful Protest** (`peaceful_protest`)
+- **Excessive Force Against Protesters** (`excessive_force_against_protesters`)
+- **Protest With Intervention** (`protest_with_intervention`)
+- **Violent Demonstration** (`violent_demonstration`)
+- **Mob Violence** (`mob_violence`)
+
+### Explosions Remote Violence
+
+**Type ID**: `explosions_remote_violence`  
+**Subtypes**: 6
+
+- **Air Drone Strike** (`air_drone_strike`)
+- **Suicide Bomb** (`suicide_bomb`)
+- **Shelling Artillery Missile Attack** (`shelling_artillery_missile_attack`)
+- **Remote Explosive Landmine Ied** (`remote_explosive_landmine_ied`)
+- **Grenade** (`grenade`)
+- **Chemical Weapon** (`chemical_weapon`)
+
+### Violence Against Civilians
+
+**Type ID**: `violence_against_civilians`  
+**Subtypes**: 3
+
+- **Sexual Violence** (`sexual_violence`)
+- **Attack** (`attack`)
+- **Abduction Forced Disappearance** (`abduction_forced_disappearance`)
+
+### Strategic Developments
+
+**Type ID**: `strategic_developments`  
+**Subtypes**: 8
+
+- **Agreement** (`agreement`)
+- **Arrests** (`arrests`)
+- **Change To Group Activity** (`change_to_group_activity`)
+- **Disrupted Weapons Use** (`disrupted_weapons_use`)
+- **Headquarters Or Base Established** (`headquarters_or_base_established`)
+- **Looting Property Destruction** (`looting_property_destruction`)
+- **Non Violent Transfer Of Territory** (`non_violent_transfer_of_territory`)
+- **Other** (`other`)
+
+## Example API Queries
+
+### Get all Conflict & Crisis events
+
+```python
+import requests
+
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params={"event_category": "conflict"}
+)
+events = response.json()
+```
+
+### Get Battles events
+
+```python
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params={
+        "event_category": "conflict",
+        "event_type": "battles"
+    }
+)
+```
+
+## Conceptual Guidance
+
+When classifying conflict events:
+
+- **Battles** involve direct armed combat between organized groups
+- **Civil Unrest** covers protests and demonstrations, from peaceful to violent
+- **Explosions & Remote Violence** includes attacks where the perpetrator is not at the immediate location
+- **Violence Against Civilians** focuses on targeting of non-combatants
+- **Strategic Developments** captures non-violent but significant conflict-related changes
+
+**Key Distinction**: "Government Regains Territory" vs "Armed Clash" - Use the former when there's a clear territorial change, the latter for combat without territorial shift.
+
+[← Back to Taxonomy Overview](/guides/corpus-api/taxonomy)

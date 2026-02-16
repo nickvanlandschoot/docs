@@ -1,0 +1,253 @@
+---
+title: "Data Models Reference"
+description: "Complete field structures and schemas for events, actors, and locations"
+---
+
+# Data Models
+
+This page documents the complete data structures returned by the Corpus Product API.
+
+## EventResponse
+
+The standard event object returned by list endpoints.
+
+### Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Unique event identifier |
+| `title` | string | Event title/headline |
+| `description` | string | Detailed event description |
+| `event_date` | date | Date when the event occurred (YYYY-MM-DD) |
+| `event_category` | string | Category ID (e.g., "conflict", "cyber") |
+| `event_type` | string | Type ID within category |
+| `event_subtype` | string | Subtype ID within type |
+| `country` | string | Country where event occurred |
+| `location` | string | Specific location/city |
+| `latitude` | float | Latitude coordinate (nullable) |
+| `longitude` | float | Longitude coordinate (nullable) |
+| `source_url` | string | URL to source article (nullable) |
+| `created_at` | datetime | When record was created |
+
+### Example JSON
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "title": "Cyber attack targets financial institutions",
+  "description": "A sophisticated ransomware attack affected multiple banks...",
+  "event_date": "2026-02-15",
+  "event_category": "cyber",
+  "event_type": "cyber_attack",
+  "event_subtype": "ransomware",
+  "country": "United States",
+  "location": "New York",
+  "latitude": 40.7128,
+  "longitude": -74.0060,
+  "source_url": "https://example.com/article",
+  "created_at": "2026-02-15T14:30:00Z"
+}
+```
+
+## EventDetailResponse
+
+Extended event object with actors and category-specific metadata.
+
+Includes all fields from `EventResponse` plus:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `actors` | ActorInEvent[] | List of actors involved in the event |
+| `metadata` | object | Category-specific metadata fields |
+
+### ActorInEvent Structure
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Actor unique identifier |
+| `canonical_name` | string | Actor's canonical name |
+| `actor_type` | string | Actor type classification |
+| `position` | string | Actor's role: PRINCIPAL, SECONDARY, SUB_PRINCIPAL, SUB_SECONDARY, SUPPORTING_PRINCIPAL, SUPPORTING_SECONDARY |
+
+### Metadata by Category
+
+The `metadata` field contains category-specific fields. See each category's taxonomy page for field definitions.
+
+**Example for Conflict event:**
+
+```json
+{
+  "id": "...",
+  "title": "Armed clash between government and rebel forces",
+  "event_category": "conflict",
+  "event_type": "battles",
+  "event_subtype": "armed_clash",
+  "actors": [
+    {
+      "id": "actor-uuid-1",
+      "canonical_name": "National Army",
+      "actor_type": "military",
+      "position": "PRINCIPAL"
+    },
+    {
+      "id": "actor-uuid-2",
+      "canonical_name": "Rebel Group X",
+      "actor_type": "rebel_group",
+      "position": "SECONDARY"
+    }
+  ],
+  "metadata": {
+    "disorder_type": "Political violence",
+    "fatalities": 15,
+    "injuries": 23,
+    "civilian_targeting": false
+  }
+}
+```
+
+## ActorResponse
+
+The standard actor object returned by list endpoints.
+
+### Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Unique actor identifier |
+| `canonical_name` | string | Actor's canonical/standardized name |
+| `actor_type` | string | Actor type classification |
+| `aliases` | string[] | Alternative names/spellings (nullable) |
+| `created_at` | datetime | When record was created |
+
+### Example JSON
+
+```json
+{
+  "id": "660e8400-e29b-41d4-a716-446655440000",
+  "canonical_name": "National Liberation Front",
+  "actor_type": "rebel_group",
+  "aliases": ["NLF", "Liberation Front"],
+  "created_at": "2026-01-10T09:00:00Z"
+}
+```
+
+## ActorDetailResponse
+
+Extended actor object with statistics and relationships.
+
+Includes all fields from `ActorResponse` plus:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `event_count` | integer | Number of events this actor is involved in |
+| `first_event_date` | date | Date of first associated event (nullable) |
+| `last_event_date` | date | Date of most recent event (nullable) |
+
+## PaginatedEventsResponse
+
+Wrapper for paginated event listings.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `items` | EventResponse[] | Array of events |
+| `total` | integer | Total number of matching events |
+| `page` | integer | Current page number |
+| `page_size` | integer | Number of items per page |
+| `total_pages` | integer | Total number of pages |
+
+### Example JSON
+
+```json
+{
+  "items": [...],
+  "total": 1234,
+  "page": 1,
+  "page_size": 50,
+  "total_pages": 25
+}
+```
+
+## PaginatedActorsResponse
+
+Same structure as PaginatedEventsResponse but with `items` as ActorResponse[].
+
+## CountryAggregation
+
+Country with event count.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `country` | string | Country name |
+| `event_count` | integer | Number of events in this country |
+
+## RegionAggregation
+
+Location/region with event count.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `location` | string | City/region name |
+| `country` | string | Country name |
+| `event_count` | integer | Number of events in this location |
+
+## MetadataValueCount
+
+Generic metadata value with count.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `value` | string | The metadata value |
+| `count` | integer | Number of occurrences |
+
+Used in responses from:
+- `/v1/corpus/metadata/event-categories`
+- `/v1/corpus/metadata/event-types`
+- `/v1/corpus/metadata/event-subtypes`
+- `/v1/corpus/metadata/actor-types`
+
+## Export Formats
+
+The `/v1/corpus/events/export` endpoint supports multiple output formats:
+
+### CSV Format
+
+Standard comma-separated values with headers. Includes all event fields plus actor information.
+
+### JSON Format
+
+Array of EventDetailResponse objects with full metadata and actors.
+
+### GeoJSON Format
+
+Geographic data format suitable for mapping applications:
+
+```json
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.0060, 40.7128]
+      },
+      "properties": {
+        "id": "...",
+        "title": "...",
+        "event_category": "...",
+        ...
+      }
+    }
+  ]
+}
+```
+
+### ACLED Format
+
+Compatible with ACLED (Armed Conflict Location & Event Data Project) schema.
+
+### Flat Format
+
+Denormalized JSON with one object per event-actor combination, suitable for spreadsheet import.
+
+[← Back to Taxonomy Overview](/guides/corpus-api/taxonomy)

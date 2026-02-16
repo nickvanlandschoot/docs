@@ -1,0 +1,201 @@
+---
+title: "Corporate & M&A Taxonomy"
+description: "Complete event type and subtype reference for Corporate & M&A"
+---
+
+# Corporate & M&A
+
+**Category ID**: `corporate`
+**Icon**: building-2
+**Color**: #6366F1
+
+This category contains **7 event types** and **30 subtypes** for tracking corporate & m&a events.
+
+## Special Fields
+
+This category includes the following specialized metadata fields:
+
+| Field | Type | Required | Options |
+|-------|------|----------|----------|
+| `deal_type` | string | Yes | 8 values (see below) |
+| `deal_value_usd` | float | No |  |
+| `currency` | string | No |  |
+| `acquirer` | string | No |  |
+| `target` | string | No |  |
+| `sector` | string | No |  |
+| `regulatory_status` | string | No | 5 values (see below) |
+
+### Deal Type
+
+**Field ID**: `deal_type`  
+**Type**: string  
+**Required**: Yes  
+
+**Allowed values**:
+- `Merger`
+- `Acquisition`
+- `Divestiture`
+- `Joint venture`
+- `IPO`
+- `Bankruptcy`
+- `Restructuring`
+- `Partnership`
+
+### Deal Value Usd
+
+**Field ID**: `deal_value_usd`  
+**Type**: float  
+**Required**: No  
+
+### Currency
+
+**Field ID**: `currency`  
+**Type**: string  
+**Required**: No  
+
+### Acquirer
+
+**Field ID**: `acquirer`  
+**Type**: string  
+**Required**: No  
+
+### Target
+
+**Field ID**: `target`  
+**Type**: string  
+**Required**: No  
+
+### Sector
+
+**Field ID**: `sector`  
+**Type**: string  
+**Required**: No  
+
+### Regulatory Status
+
+**Field ID**: `regulatory_status`  
+**Type**: string  
+**Required**: No  
+
+**Allowed values**:
+- `Pending approval`
+- `Approved`
+- `Blocked`
+- `Under review`
+- `Conditionally approved`
+
+## Event Type Hierarchy
+
+The Corporate & M&A category includes the following complete hierarchy:
+
+### Merger And Acquisition
+
+**Type ID**: `merger_and_acquisition`  
+**Subtypes**: 5
+
+- **Hostile Takeover** (`hostile_takeover`)
+- **Friendly Acquisition** (`friendly_acquisition`)
+- **Reverse Merger** (`reverse_merger`)
+- **Cross Border Acquisition** (`cross_border_acquisition`)
+- **Minority Stake Purchase** (`minority_stake_purchase`)
+
+### Divestiture And Spinoff
+
+**Type ID**: `divestiture_and_spinoff`  
+**Subtypes**: 5
+
+- **Asset Sale** (`asset_sale`)
+- **Carve Out** (`carve_out`)
+- **Subsidiary Spinoff** (`subsidiary_spinoff`)
+- **Management Buyout** (`management_buyout`)
+- **Forced Divestiture** (`forced_divestiture`)
+
+### Ipo And Public Offering
+
+**Type ID**: `ipo_and_public_offering`  
+**Subtypes**: 4
+
+- **Initial Public Offering** (`initial_public_offering`)
+- **Direct Listing** (`direct_listing`)
+- **Spac Merger** (`spac_merger`)
+- **Secondary Offering** (`secondary_offering`)
+
+### Bankruptcy And Restructuring
+
+**Type ID**: `bankruptcy_and_restructuring`  
+**Subtypes**: 4
+
+- **Chapter 11 Filing** (`chapter_11_filing`)
+- **Liquidation** (`liquidation`)
+- **Debt Restructuring** (`debt_restructuring`)
+- **Creditor Agreement** (`creditor_agreement`)
+
+### Joint Venture And Partnership
+
+**Type ID**: `joint_venture_and_partnership`  
+**Subtypes**: 4
+
+- **Strategic Alliance** (`strategic_alliance`)
+- **Joint Venture Formation** (`joint_venture_formation`)
+- **Licensing Agreement** (`licensing_agreement`)
+- **Consortium Formation** (`consortium_formation`)
+
+### Executive And Governance
+
+**Type ID**: `executive_and_governance`  
+**Subtypes**: 4
+
+- **Ceo Change** (`ceo_change`)
+- **Board Shakeup** (`board_shakeup`)
+- **Shareholder Activism** (`shareholder_activism`)
+- **Regulatory Investigation** (`regulatory_investigation`)
+
+### Sanctions And Compliance
+
+**Type ID**: `sanctions_and_compliance`  
+**Subtypes**: 4
+
+- **Sanctions Designation** (`sanctions_designation`)
+- **Sanctions Removal** (`sanctions_removal`)
+- **Regulatory Fine** (`regulatory_fine`)
+- **Compliance Violation** (`compliance_violation`)
+
+## Example API Queries
+
+### Get all Corporate & M&A events
+
+```python
+import requests
+
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params={"event_category": "corporate"}
+)
+events = response.json()
+```
+
+### Get Merger And Acquisition events
+
+```python
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params={
+        "event_category": "corporate",
+        "event_type": "merger_and_acquisition"
+    }
+)
+```
+
+## Conceptual Guidance
+
+Corporate events follow the M&A lifecycle:
+
+- **deal_type** categorizes the transaction structure
+- **regulatory_status** tracks approval process
+- **deal_value_usd** enables financial threshold filtering
+
+**Key Distinction**: "Friendly Acquisition" vs "Hostile Takeover" - determined by target company board approval.
+
+[← Back to Taxonomy Overview](/guides/corpus-api/taxonomy)

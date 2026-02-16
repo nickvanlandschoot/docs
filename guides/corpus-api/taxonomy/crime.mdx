@@ -1,0 +1,209 @@
+---
+title: "Crime & Justice Taxonomy"
+description: "Complete event type and subtype reference for Crime & Justice"
+---
+
+# Crime & Justice
+
+**Category ID**: `crime`
+**Icon**: gavel
+**Color**: #F59E0B
+
+This category contains **8 event types** and **35 subtypes** for tracking crime & justice events.
+
+## Special Fields
+
+This category includes the following specialized metadata fields:
+
+| Field | Type | Required | Options |
+|-------|------|----------|----------|
+| `crime_category` | string | Yes | 5 values (see below) |
+| `severity` | string | Yes | 4 values (see below) |
+| `suspects_count` | integer | No |  |
+| `victims_count` | integer | No |  |
+| `law_enforcement_involved` | boolean | No |  |
+| `judicial_status` | string | No | 6 values (see below) |
+
+### Crime Category
+
+**Field ID**: `crime_category`  
+**Type**: string  
+**Required**: Yes  
+
+**Allowed values**:
+- `Violent crime`
+- `Property crime`
+- `White-collar crime`
+- `Public order crime`
+- `Drug-related crime`
+
+### Severity
+
+**Field ID**: `severity`  
+**Type**: string  
+**Required**: Yes  
+
+**Allowed values**:
+- `Minor`
+- `Moderate`
+- `Severe`
+- `Critical`
+
+### Suspects Count
+
+**Field ID**: `suspects_count`  
+**Type**: integer  
+**Required**: No  
+
+### Victims Count
+
+**Field ID**: `victims_count`  
+**Type**: integer  
+**Required**: No  
+
+### Law Enforcement Involved
+
+**Field ID**: `law_enforcement_involved`  
+**Type**: boolean  
+**Required**: No  
+
+### Judicial Status
+
+**Field ID**: `judicial_status`  
+**Type**: string  
+**Required**: No  
+
+**Allowed values**:
+- `Under investigation`
+- `Charges filed`
+- `Trial in progress`
+- `Convicted`
+- `Acquitted`
+- `Appealed`
+
+## Event Type Hierarchy
+
+The Crime & Justice category includes the following complete hierarchy:
+
+### Homicide
+
+**Type ID**: `homicide`  
+**Subtypes**: 5
+
+- **Premeditated Murder** (`premeditated_murder`)
+- **Manslaughter** (`manslaughter`)
+- **Vehicular Homicide** (`vehicular_homicide`)
+- **Mass Casualty Attack** (`mass_casualty_attack`)
+- **Targeted Assassination** (`targeted_assassination`)
+
+### Robbery And Theft
+
+**Type ID**: `robbery_and_theft`  
+**Subtypes**: 4
+
+- **Armed Robbery** (`armed_robbery`)
+- **Burglary** (`burglary`)
+- **Carjacking** (`carjacking`)
+- **Grand Theft** (`grand_theft`)
+
+### Fraud And Financial Crime
+
+**Type ID**: `fraud_and_financial_crime`  
+**Subtypes**: 6
+
+- **Embezzlement** (`embezzlement`)
+- **Money Laundering** (`money_laundering`)
+- **Securities Fraud** (`securities_fraud`)
+- **Tax Evasion** (`tax_evasion`)
+- **Insurance Fraud** (`insurance_fraud`)
+- **General Fraud** (`general_fraud`)
+
+### Corruption
+
+**Type ID**: `corruption`  
+**Subtypes**: 4
+
+- **Bribery** (`bribery`)
+- **Abuse Of Office** (`abuse_of_office`)
+- **Nepotism And Patronage** (`nepotism_and_patronage`)
+- **Judicial Corruption** (`judicial_corruption`)
+
+### Arrests And Detention
+
+**Type ID**: `arrests_and_detention`  
+**Subtypes**: 4
+
+- **Mass Arrest** (`mass_arrest`)
+- **High Profile Arrest** (`high_profile_arrest`)
+- **Extradition** (`extradition`)
+- **Unlawful Detention** (`unlawful_detention`)
+
+### Judicial Proceedings
+
+**Type ID**: `judicial_proceedings`  
+**Subtypes**: 4
+
+- **Indictment** (`indictment`)
+- **Trial Verdict** (`trial_verdict`)
+- **Sentencing** (`sentencing`)
+- **Appeal Ruling** (`appeal_ruling`)
+
+### Drug Offenses
+
+**Type ID**: `drug_offenses`  
+**Subtypes**: 4
+
+- **Drug Seizure** (`drug_seizure`)
+- **Drug Manufacturing** (`drug_manufacturing`)
+- **Drug Distribution** (`drug_distribution`)
+- **Possession** (`possession`)
+
+### Sexual And Gender Based Crime
+
+**Type ID**: `sexual_and_gender_based_crime`  
+**Subtypes**: 4
+
+- **Sexual Assault** (`sexual_assault`)
+- **Domestic Violence** (`domestic_violence`)
+- **Human Trafficking For Exploitation** (`human_trafficking_for_exploitation`)
+- **Forced Marriage** (`forced_marriage`)
+
+## Example API Queries
+
+### Get all Crime & Justice events
+
+```python
+import requests
+
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params={"event_category": "crime"}
+)
+events = response.json()
+```
+
+### Get Homicide events
+
+```python
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params={
+        "event_category": "crime",
+        "event_type": "homicide"
+    }
+)
+```
+
+## Conceptual Guidance
+
+Crime events are classified by both the **crime_category** and **judicial_status**:
+
+- Use **severity** to indicate impact level (Minor → Critical)
+- Track progression through the justice system via **judicial_status**
+- **Homicide** vs **Mass Casualty Attack**: Individual/small group killings vs large-scale attacks
+
+The **law_enforcement_involved** flag indicates whether authorities are actively engaged in the case.
+
+[← Back to Taxonomy Overview](/guides/corpus-api/taxonomy)

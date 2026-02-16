@@ -1,0 +1,194 @@
+---
+title: "Political & Policy Taxonomy"
+description: "Complete event type and subtype reference for Political & Policy"
+---
+
+# Political & Policy
+
+**Category ID**: `political`
+**Icon**: landmark
+**Color**: #2563EB
+
+This category contains **8 event types** and **40 subtypes** for tracking political & policy events.
+
+## Special Fields
+
+This category includes the following specialized metadata fields:
+
+| Field | Type | Required | Options |
+|-------|------|----------|----------|
+| `political_domain` | string | Yes | 6 values (see below) |
+| `government_level` | string | No | 4 values (see below) |
+| `actors` | array | No |  |
+| `legislation_id` | string | No |  |
+
+### Political Domain
+
+**Field ID**: `political_domain`  
+**Type**: string  
+**Required**: Yes  
+
+**Allowed values**:
+- `Domestic policy`
+- `Foreign policy`
+- `Electoral`
+- `Legislative`
+- `Judicial`
+- `Diplomatic`
+
+### Government Level
+
+**Field ID**: `government_level`  
+**Type**: string  
+**Required**: No  
+
+**Allowed values**:
+- `Local`
+- `Regional`
+- `National`
+- `International`
+
+### Actors
+
+**Field ID**: `actors`  
+**Type**: array  
+**Required**: No  
+
+### Legislation Id
+
+**Field ID**: `legislation_id`  
+**Type**: string  
+**Required**: No  
+
+## Event Type Hierarchy
+
+The Political & Policy category includes the following complete hierarchy:
+
+### Election
+
+**Type ID**: `election`  
+**Subtypes**: 5
+
+- **National Election** (`national_election`)
+- **Regional Local Election** (`regional_local_election`)
+- **Referendum** (`referendum`)
+- **Election Irregularity** (`election_irregularity`)
+- **Election Result Announcement** (`election_result_announcement`)
+
+### Legislation
+
+**Type ID**: `legislation`  
+**Subtypes**: 5
+
+- **Bill Introduced** (`bill_introduced`)
+- **Bill Passed** (`bill_passed`)
+- **Bill Vetoed** (`bill_vetoed`)
+- **Executive Order** (`executive_order`)
+- **Constitutional Amendment** (`constitutional_amendment`)
+
+### Diplomatic Event
+
+**Type ID**: `diplomatic_event`  
+**Subtypes**: 6
+
+- **Treaty Signed** (`treaty_signed`)
+- **Treaty Withdrawn** (`treaty_withdrawn`)
+- **Diplomatic Recognition** (`diplomatic_recognition`)
+- **Diplomatic Expulsion** (`diplomatic_expulsion`)
+- **Sanctions Imposed** (`sanctions_imposed`)
+- **Sanctions Lifted** (`sanctions_lifted`)
+
+### Regime Change
+
+**Type ID**: `regime_change`  
+**Subtypes**: 4
+
+- **Coup Attempt** (`coup_attempt`)
+- **Peaceful Transition** (`peaceful_transition`)
+- **Government Dissolution** (`government_dissolution`)
+- **State Of Emergency Declared** (`state_of_emergency_declared`)
+
+### Policy Announcement
+
+**Type ID**: `policy_announcement`  
+**Subtypes**: 5
+
+- **Economic Policy** (`economic_policy`)
+- **Security Policy** (`security_policy`)
+- **Social Policy** (`social_policy`)
+- **Trade Policy** (`trade_policy`)
+- **Immigration Policy** (`immigration_policy`)
+
+### International Organization
+
+**Type ID**: `international_organization`  
+**Subtypes**: 4
+
+- **Un Resolution** (`un_resolution`)
+- **Multilateral Summit** (`multilateral_summit`)
+- **Membership Change** (`membership_change`)
+- **Peacekeeping Deployment** (`peacekeeping_deployment`)
+
+### Political Realignment
+
+**Type ID**: `political_realignment`  
+**Subtypes**: 5
+
+- **Party Switch** (`party_switch`)
+- **Coalition Formation** (`coalition_formation`)
+- **Coalition Collapse** (`coalition_collapse`)
+- **Party Merger** (`party_merger`)
+- **Party Split** (`party_split`)
+
+### Judicial Action
+
+**Type ID**: `judicial_action`  
+**Subtypes**: 6
+
+- **Court Ruling** (`court_ruling`)
+- **Judicial Review** (`judicial_review`)
+- **Constitutional Challenge** (`constitutional_challenge`)
+- **Impeachment Proceeding** (`impeachment_proceeding`)
+- **Judicial Appointment Confirmed** (`judicial_appointment_confirmed`)
+- **Judicial Misconduct** (`judicial_misconduct`)
+
+## Example API Queries
+
+### Get all Political & Policy events
+
+```python
+import requests
+
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params={"event_category": "political"}
+)
+events = response.json()
+```
+
+### Get Election events
+
+```python
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params={
+        "event_category": "political",
+        "event_type": "election"
+    }
+)
+```
+
+## Conceptual Guidance
+
+Political events are organized by domain:
+
+- **Electoral**: Elections and referendums
+- **Legislative**: Bills, laws, and constitutional changes
+- **Diplomatic**: International relations and treaties
+- **Judicial**: Court rulings and legal challenges
+
+Use **government_level** to filter by scope (Local → International).
+
+[← Back to Taxonomy Overview](/guides/corpus-api/taxonomy)

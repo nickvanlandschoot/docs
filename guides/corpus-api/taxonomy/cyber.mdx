@@ -1,0 +1,190 @@
+---
+title: "Cyber & Threat Intel Taxonomy"
+description: "Complete event type and subtype reference for Cyber & Threat Intel"
+---
+
+# Cyber & Threat Intel
+
+**Category ID**: `cyber`
+**Icon**: shield-check
+**Color**: #8B5CF6
+
+This category contains **5 event types** and **24 subtypes** for tracking cyber & threat intel events.
+
+## Special Fields
+
+This category includes the following specialized metadata fields:
+
+| Field | Type | Required | Options |
+|-------|------|----------|----------|
+| `threat_type` | string | Yes | 5 values (see below) |
+| `attack_vector` | string | No | 8 values (see below) |
+| `severity` | string | Yes | 4 values (see below) |
+| `target_sector` | string | No |  |
+| `threat_actor` | string | No |  |
+| `cve_ids` | array | No |  |
+| `ioc_count` | integer | No |  |
+
+### Threat Type
+
+**Field ID**: `threat_type`  
+**Type**: string  
+**Required**: Yes  
+
+**Allowed values**:
+- `Nation-state`
+- `Criminal`
+- `Hacktivist`
+- `Insider`
+- `Unknown`
+
+### Attack Vector
+
+**Field ID**: `attack_vector`  
+**Type**: string  
+**Required**: No  
+
+**Allowed values**:
+- `Phishing`
+- `Exploit`
+- `Supply chain`
+- `Zero-day`
+- `Brute force`
+- `Social engineering`
+- `Physical`
+- `Unknown`
+
+### Severity
+
+**Field ID**: `severity`  
+**Type**: string  
+**Required**: Yes  
+
+**Allowed values**:
+- `Low`
+- `Medium`
+- `High`
+- `Critical`
+
+### Target Sector
+
+**Field ID**: `target_sector`  
+**Type**: string  
+**Required**: No  
+
+### Threat Actor
+
+**Field ID**: `threat_actor`  
+**Type**: string  
+**Required**: No  
+
+### Cve Ids
+
+**Field ID**: `cve_ids`  
+**Type**: array  
+**Required**: No  
+
+### Ioc Count
+
+**Field ID**: `ioc_count`  
+**Type**: integer  
+**Required**: No  
+
+## Event Type Hierarchy
+
+The Cyber & Threat Intel category includes the following complete hierarchy:
+
+### Cyber Attack
+
+**Type ID**: `cyber_attack`  
+**Subtypes**: 6
+
+- **Ransomware** (`ransomware`)
+- **Distributed Denial Of Service** (`distributed_denial_of_service`)
+- **Data Exfiltration** (`data_exfiltration`)
+- **Website Defacement** (`website_defacement`)
+- **Wiper Malware** (`wiper_malware`)
+- **Supply Chain Compromise** (`supply_chain_compromise`)
+
+### Vulnerability Disclosure
+
+**Type ID**: `vulnerability_disclosure`  
+**Subtypes**: 4
+
+- **Zero Day Discovery** (`zero_day_discovery`)
+- **Patch Release** (`patch_release`)
+- **Proof Of Concept Published** (`proof_of_concept_published`)
+- **Active Exploitation Confirmed** (`active_exploitation_confirmed`)
+
+### Data Breach
+
+**Type ID**: `data_breach`  
+**Subtypes**: 5
+
+- **Personal Data Leak** (`personal_data_leak`)
+- **Credentials Exposed** (`credentials_exposed`)
+- **Financial Data Breach** (`financial_data_breach`)
+- **Government Data Breach** (`government_data_breach`)
+- **Healthcare Data Breach** (`healthcare_data_breach`)
+
+### Threat Actor Activity
+
+**Type ID**: `threat_actor_activity`  
+**Subtypes**: 4
+
+- **New Threat Group Identified** (`new_threat_group_identified`)
+- **Infrastructure Change** (`infrastructure_change`)
+- **Tooling Update** (`tooling_update`)
+- **Campaign Attribution** (`campaign_attribution`)
+
+### Critical Infrastructure Incident
+
+**Type ID**: `critical_infrastructure_incident`  
+**Subtypes**: 5
+
+- **Power Grid Disruption** (`power_grid_disruption`)
+- **Telecommunications Outage** (`telecommunications_outage`)
+- **Financial System Disruption** (`financial_system_disruption`)
+- **Transportation System Disruption** (`transportation_system_disruption`)
+- **Water System Compromise** (`water_system_compromise`)
+
+## Example API Queries
+
+### Get all Cyber & Threat Intel events
+
+```python
+import requests
+
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params={"event_category": "cyber"}
+)
+events = response.json()
+```
+
+### Get Cyber Attack events
+
+```python
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params={
+        "event_category": "cyber",
+        "event_type": "cyber_attack"
+    }
+)
+```
+
+## Conceptual Guidance
+
+Cyber events are categorized by threat nature:
+
+- **threat_type** indicates actor motivation (Nation-state, Criminal, Hacktivist)
+- **attack_vector** describes the technical method
+- **severity** rates impact (Low → Critical)
+- **cve_ids** links to specific vulnerabilities
+
+**Attribution Confidence**: Use the dedicated field to indicate certainty level.
+
+[← Back to Taxonomy Overview](/guides/corpus-api/taxonomy)

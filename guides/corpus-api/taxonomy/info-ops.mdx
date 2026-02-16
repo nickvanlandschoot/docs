@@ -1,0 +1,192 @@
+---
+title: "Information Operations & Influence Taxonomy"
+description: "Complete event type and subtype reference for Information Operations & Influence"
+---
+
+# Information Operations & Influence
+
+**Category ID**: `info_ops`
+**Icon**: radio-tower
+**Color**: #D97706
+
+This category contains **6 event types** and **29 subtypes** for tracking information operations & influence events.
+
+## Special Fields
+
+This category includes the following specialized metadata fields:
+
+| Field | Type | Required | Options |
+|-------|------|----------|----------|
+| `operation_type` | string | Yes | 4 values (see below) |
+| `medium` | string | Yes | 6 values (see below) |
+| `target_audience` | string | No | 6 values (see below) |
+| `attribution_confidence` | string | No | 4 values (see below) |
+| `platforms_affected` | array | No |  |
+
+### Operation Type
+
+**Field ID**: `operation_type`  
+**Type**: string  
+**Required**: Yes  
+
+**Allowed values**:
+- `State-sponsored`
+- `Non-state`
+- `Commercial`
+- `Unknown`
+
+### Medium
+
+**Field ID**: `medium`  
+**Type**: string  
+**Required**: Yes  
+
+**Allowed values**:
+- `Social media`
+- `Traditional media`
+- `Messaging platforms`
+- `Print`
+- `Broadcast`
+- `Multiple`
+
+### Target Audience
+
+**Field ID**: `target_audience`  
+**Type**: string  
+**Required**: No  
+
+**Allowed values**:
+- `Domestic`
+- `Foreign`
+- `Diaspora`
+- `Global`
+- `Military`
+- `Specific demographic`
+
+### Attribution Confidence
+
+**Field ID**: `attribution_confidence`  
+**Type**: string  
+**Required**: No  
+
+**Allowed values**:
+- `Confirmed`
+- `Probable`
+- `Possible`
+- `Unattributed`
+
+### Platforms Affected
+
+**Field ID**: `platforms_affected`  
+**Type**: array  
+**Required**: No  
+
+## Event Type Hierarchy
+
+The Information Operations & Influence category includes the following complete hierarchy:
+
+### Disinformation Campaign
+
+**Type ID**: `disinformation_campaign`  
+**Subtypes**: 6
+
+- **Coordinated Inauthentic Behavior** (`coordinated_inauthentic_behavior`)
+- **Deepfake Deployment** (`deepfake_deployment`)
+- **Fabricated News Outlet** (`fabricated_news_outlet`)
+- **Forged Document Leak** (`forged_document_leak`)
+- **Bot Network Operation** (`bot_network_operation`)
+- **Astroturfing** (`astroturfing`)
+
+### Propaganda
+
+**Type ID**: `propaganda`  
+**Subtypes**: 4
+
+- **State Media Narrative** (`state_media_narrative`)
+- **Foreign Influence Broadcast** (`foreign_influence_broadcast`)
+- **Radicalization Content** (`radicalization_content`)
+- **Historical Revisionism** (`historical_revisionism`)
+
+### Censorship And Suppression
+
+**Type ID**: `censorship_and_suppression`  
+**Subtypes**: 6
+
+- **Internet Shutdown** (`internet_shutdown`)
+- **Website Blocking** (`website_blocking`)
+- **Platform Ban** (`platform_ban`)
+- **Journalist Detention** (`journalist_detention`)
+- **Content Takedown Order** (`content_takedown_order`)
+- **Publication Seizure** (`publication_seizure`)
+
+### Election Interference
+
+**Type ID**: `election_interference`  
+**Subtypes**: 4
+
+- **Voter Suppression Campaign** (`voter_suppression_campaign`)
+- **Hack And Leak Operation** (`hack_and_leak_operation`)
+- **Foreign Campaign Financing** (`foreign_campaign_financing`)
+- **Polling Manipulation** (`polling_manipulation`)
+
+### Influence Operation
+
+**Type ID**: `influence_operation`  
+**Subtypes**: 5
+
+- **Foreign Agent Activity** (`foreign_agent_activity`)
+- **Think Tank Capture** (`think_tank_capture`)
+- **Academic Infiltration** (`academic_infiltration`)
+- **Lobby Operation** (`lobby_operation`)
+- **Cultural Influence Campaign** (`cultural_influence_campaign`)
+
+### Media Manipulation
+
+**Type ID**: `media_manipulation`  
+**Subtypes**: 4
+
+- **Narrative Laundering** (`narrative_laundering`)
+- **Source Fabrication** (`source_fabrication`)
+- **Selective Amplification** (`selective_amplification`)
+- **Context Manipulation** (`context_manipulation`)
+
+## Example API Queries
+
+### Get all Information Operations & Influence events
+
+```python
+import requests
+
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params={"event_category": "info_ops"}
+)
+events = response.json()
+```
+
+### Get Disinformation Campaign events
+
+```python
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params={
+        "event_category": "info_ops",
+        "event_type": "disinformation_campaign"
+    }
+)
+```
+
+## Conceptual Guidance
+
+Information operations are classified by:
+
+- **operation_type**: Attribution of who's behind it
+- **medium**: Platform or channel used
+- **target_audience**: Intended recipients
+- **attribution_confidence**: Certainty of attribution
+
+**Disinformation** vs **Propaganda**: False information vs biased but not necessarily false narratives.
+
+[← Back to Taxonomy Overview](/guides/corpus-api/taxonomy)

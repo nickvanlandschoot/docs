@@ -1,0 +1,150 @@
+---
+title: "Actor Types Reference"
+description: "Complete list of actor type values in the Intrace Corpus"
+---
+
+# Actor Types
+
+The Intrace Corpus classifies actors into distinct types to enable precise filtering and analysis. Each actor in the system has an `actor_type` field that indicates their classification.
+
+## Overview
+
+Actor types are used to categorize entities involved in events. The classification system covers:
+
+- **Government and state actors**
+- **Military and security forces**
+- **Political organizations and parties**
+- **Non-state armed groups**
+- **Criminal organizations**
+- **Civil society and activist groups**
+- **Media and press**
+- **International organizations**
+- **Corporations and businesses**
+- **Individuals**
+
+## Using Actor Types in Queries
+
+### List Actors by Type
+
+```python
+import requests
+
+# Get all government actors
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/actors",
+    headers={"X-API-Key": "your-api-key"},
+    params={"actor_type": "state_government"}
+)
+```
+
+### Discover Available Actor Types
+
+Use the metadata endpoint to see all actor types currently in the corpus:
+
+```python
+# Get all actor types with counts
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/metadata/actor-types",
+    headers={"X-API-Key": "your-api-key"}
+)
+actor_types = response.json()
+```
+
+## Actor Type Definitions
+
+The following actor types are commonly found in the corpus. Use the metadata endpoint above to get the current complete list with counts.
+
+### State & Government
+
+- **National Government**: Federal/central government bodies
+- **Regional Government**: State, provincial, or regional authorities
+- **Local Government**: Municipal or local government entities
+- **Government Agency**: Specific government departments or agencies
+- **Law Enforcement**: Police, national guard, and law enforcement bodies
+- **Military**: Armed forces and military organizations
+- **Intelligence Agency**: Intelligence and security services
+
+### Political Organizations
+
+- **Political Party**: Registered political parties and movements
+- **Political Coalition**: Alliances of political parties
+- **Opposition Group**: Opposition political movements
+
+### Armed Groups
+
+- **Rebel Group**: Armed opposition forces
+- **Militia**: Non-state armed militias
+- **Paramilitary**: Paramilitary organizations
+- **Terrorist Organization**: Designated terrorist groups
+
+### Criminal Organizations
+
+- **Cartel**: Drug cartels and trafficking organizations
+- **Gang**: Street gangs and organized crime groups
+- **Mafia**: Traditional organized crime syndicates
+
+### Civil Society
+
+- **NGO**: Non-governmental organizations
+- **Activist Group**: Civil society and activist movements
+- **Labor Union**: Trade unions and labor organizations
+- **Religious Group**: Religious organizations and movements
+
+### Media & Press
+
+- **Media Outlet**: News organizations and media companies
+- **Journalist**: Individual journalists and correspondents
+
+### International
+
+- **International Organization**: UN, regional bodies (AU, EU, etc.)
+- **Foreign Government**: Governments of other nations
+- **Multinational Alliance**: NATO, coalitions, etc.
+
+### Corporate
+
+- **Corporation**: Private companies and businesses
+- **Industry Group**: Industry associations and lobbying groups
+
+### Individual
+
+- **Individual**: Named individuals (politicians, activists, etc.)
+- **Unknown**: Unidentified or unattributed actors
+
+## Actor Hierarchy
+
+Some events may involve multiple actors in different roles:
+
+- **Principal**: Primary actor in the event
+- **Secondary**: Secondary or opposing actor
+- **Sub-Principal/Sub-Secondary**: Internal units of the main actors
+- **Supporting Principal/Supporting Secondary**: External actors providing support
+
+See the [Event Data Models](/guides/corpus-api/taxonomy/data-models) page for details on actor positions in events.
+
+## Filtering Events by Actor Type
+
+You cannot directly filter events by actor type through the events endpoint, but you can:
+
+1. **Find actors of a specific type**
+2. **Get events for those actors**
+
+```python
+# Step 1: Find all rebel group actors
+actors_response = requests.get(
+    "https://api.intrace.com/v1/corpus/actors",
+    headers={"X-API-Key": "your-api-key"},
+    params={"actor_type": "rebel_group"}
+)
+actors = actors_response.json()["items"]
+
+# Step 2: Get events for a specific actor
+for actor in actors:
+    events_response = requests.get(
+        f"https://api.intrace.com/v1/corpus/actors/{actor['id']}/events",
+        headers={"X-API-Key": "your-api-key"}
+    )
+    events = events_response.json()
+```
+
+[← Back to Taxonomy Overview](/guides/corpus-api/taxonomy)

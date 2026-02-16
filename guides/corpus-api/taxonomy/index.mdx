@@ -1,0 +1,172 @@
+---
+title: "Event Taxonomy Overview"
+description: "Complete classification system for events in the Intrace Corpus"
+---
+
+# Event Taxonomy
+
+The Intrace Corpus uses a comprehensive three-level taxonomy to classify all events:
+
+**Category → Event Type → Subtype**
+
+This hierarchical structure enables precise filtering and analysis across 8 major categories, 52 event types, and 248 specific subtypes.
+
+## Taxonomy Statistics
+
+| Level | Count | Description |
+|-------|-------|-------------|
+| **Categories** | 8 | Top-level classification domains |
+| **Event Types** | 52 | Specific event classifications within categories |
+| **Subtypes** | 248 | Granular event variations |
+
+## Category Quick Reference
+
+
+### Conflict & Crisis
+
+- **Icon**: shield-alert
+- **Color**: #DC2626
+- **Event Types**: 5
+- **Subtypes**: 25
+- **Special Fields**: 5
+
+[View complete Conflict & Crisis taxonomy →](/guides/corpus-api/taxonomy/conflict)
+
+### Crime & Justice
+
+- **Icon**: gavel
+- **Color**: #F59E0B
+- **Event Types**: 8
+- **Subtypes**: 35
+- **Special Fields**: 6
+
+[View complete Crime & Justice taxonomy →](/guides/corpus-api/taxonomy/crime)
+
+### Corporate & M&A
+
+- **Icon**: building-2
+- **Color**: #6366F1
+- **Event Types**: 7
+- **Subtypes**: 30
+- **Special Fields**: 7
+
+[View complete Corporate & M&A taxonomy →](/guides/corpus-api/taxonomy/corporate)
+
+### Political & Policy
+
+- **Icon**: landmark
+- **Color**: #2563EB
+- **Event Types**: 8
+- **Subtypes**: 40
+- **Special Fields**: 4
+
+[View complete Political & Policy taxonomy →](/guides/corpus-api/taxonomy/political)
+
+### Cyber & Threat Intel
+
+- **Icon**: shield-check
+- **Color**: #8B5CF6
+- **Event Types**: 5
+- **Subtypes**: 24
+- **Special Fields**: 7
+
+[View complete Cyber & Threat Intel taxonomy →](/guides/corpus-api/taxonomy/cyber)
+
+### Climate & Environmental Crisis
+
+- **Icon**: cloud-rain
+- **Color**: #059669
+- **Event Types**: 7
+- **Subtypes**: 37
+- **Special Fields**: 6
+
+[View complete Climate & Environmental Crisis taxonomy →](/guides/corpus-api/taxonomy/climate)
+
+### Organized Crime & Non-Political Violence
+
+- **Icon**: skull
+- **Color**: #B91C1C
+- **Event Types**: 6
+- **Subtypes**: 28
+- **Special Fields**: 5
+
+[View complete Organized Crime & Non-Political Violence taxonomy →](/guides/corpus-api/taxonomy/organized-crime)
+
+### Information Operations & Influence
+
+- **Icon**: radio-tower
+- **Color**: #D97706
+- **Event Types**: 6
+- **Subtypes**: 29
+- **Special Fields**: 5
+
+[View complete Information Operations & Influence taxonomy →](/guides/corpus-api/taxonomy/info-ops)
+
+## How to Use the Taxonomy
+
+### Filtering Events by Category
+
+```python
+import requests
+
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params={"event_category": "conflict"}
+)
+```
+
+### Filtering by Type and Subtype
+
+```python
+# Get all battles
+response = requests.get(
+    "https://api.intrace.com/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params={
+        "event_category": "conflict",
+        "event_type": "battles"
+    }
+)
+```
+
+### Discovering Available Values
+
+Use the metadata endpoints to discover all valid filter values:
+
+```python
+# Get all categories
+categories = requests.get(
+    "https://api.intrace.com/v1/corpus/metadata/categories",
+    headers={"X-API-Key": "your-api-key"}
+).json()
+
+# Get all types for a category
+types = requests.get(
+    "https://api.intrace.com/v1/corpus/metadata/types",
+    headers={"X-API-Key": "your-api-key"},
+    params={"category": "conflict"}
+).json()
+```
+
+## Conceptual Framework
+
+The taxonomy follows these principles:
+
+1. **Category** - The broadest classification, representing the domain or context
+2. **Event Type** - The specific nature of what happened
+3. **Subtype** - Precise variation or method
+
+Example hierarchy:
+- **Category**: Cyber & Threat Intel
+  - **Type**: Cyber Attack
+    - **Subtype**: Ransomware
+
+This structure allows for both broad analysis ("show me all cyber events") and precise filtering ("show me only ransomware attacks on the financial sector").
+
+## Next Steps
+
+- Explore detailed category pages to understand all types and subtypes
+- Review [Actor Types](/guides/corpus-api/taxonomy/actor-types) to understand actor classification
+- See [Data Models](/guides/corpus-api/taxonomy/data-models) for complete field structures
+- Check the [Integration Guide](/guides/corpus-api/integration-guide) for code examples
