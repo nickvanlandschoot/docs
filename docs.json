@@ -24,6 +24,7 @@
     }
   },
   "favicon": "/favicon.ico",
+  "homePage": "index",
   "modeToggle": {
     "default": "dark",
     "isHidden": true
