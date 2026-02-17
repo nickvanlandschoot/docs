@@ -173,27 +173,41 @@ See the [Event Data Models](/guides/corpus-api/taxonomy/data-models) page for co
 
 ## Filtering Events by Actor Type
 
-You cannot directly filter events by actor type through the events endpoint, but you can:
+The events endpoint does not filter directly by actor type, but you can combine the actors and actor events endpoints to achieve this efficiently:
 
-1. **Find actors of a specific type**
-2. **Get events for those actors**
+1. **Find actors of a specific type** (supports multi-value and numeric range filters)
+2. **Get events for those actors** (supports full event filter and sort surface)
 
 ```python
-# Step 1: Find all rebel group actors
+# Step 1: Find all rebel group actors in a country with event activity
 actors_response = requests.get(
     "https://api.corpus.intrace.ai/v1/corpus/actors",
     headers={"X-API-Key": "your-api-key"},
-    params={"actor_type": "rebel_group"}
+    params=[
+        ("actor_type", "rebel_group"),
+        ("actor_type", "militia"),
+        ("country", "SY"),
+        ("event_count_min", "5"),
+    ]
 )
 actors = actors_response.json()["items"]
 
-# Step 2: Get events for a specific actor
+# Step 2: Get filtered, sorted events for a specific actor
 for actor in actors:
     events_response = requests.get(
         f"https://api.corpus.intrace.ai/v1/corpus/actors/{actor['id']}/events",
-        headers={"X-API-Key": "your-api-key"}
+        headers={"X-API-Key": "your-api-key"},
+        params={
+            "event_category": "conflict",
+            "date_from": "2025-01-01",
+            "salience_score_min": "0.5",
+            "sort_by": "salience_score",
+            "sort_order": "desc",
+        }
     )
     events = events_response.json()
 ```
+
+The `/actors/{id}/events` endpoint accepts the same filter and sort parameters as `/events`, so you can narrow results without client-side filtering.
 
 [← Back to Taxonomy Overview](/guides/corpus-api/taxonomy)

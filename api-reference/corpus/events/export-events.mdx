@@ -11,12 +11,21 @@ Export events with optional filtering. Returns data in the specified format.
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `format` | string | Yes | Export format: `csv`, `json`, `geojson`, `acled`, or `flat` |
-| `event_category` | string | No | Filter by event category |
-| `event_type` | string | No | Filter by event type within category |
-| `country` | string | No | Filter by country name |
+| `event_category` | string[] | No | Filter by event category (repeatable) |
+| `event_type` | string[] | No | Filter by event type within category (repeatable) |
+| `event_subtype` | string[] | No | Filter by event subtype (repeatable) |
+| `country` | string[] | No | Filter by country code (repeatable) |
 | `date_from` | string | No | Start date (YYYY-MM-DD, inclusive) |
 | `date_to` | string | No | End date (YYYY-MM-DD, inclusive) |
 | `search` | string | No | Full-text search across title and description |
+| `salience_score_min` | float | No | Minimum salience score |
+| `salience_score_max` | float | No | Maximum salience score |
+| `article_count_min` | integer | No | Minimum number of source articles (≥ 0) |
+| `article_count_max` | integer | No | Maximum number of source articles (≥ 0) |
+| `actor_count_min` | integer | No | Minimum number of actors involved (≥ 0) |
+| `actor_count_max` | integer | No | Maximum number of actors involved (≥ 0) |
+| `sort_by` | string | No | Sort column: `event_date` (default), `salience_score`, `article_count`, `title`, `created_at` |
+| `sort_order` | string | No | Sort direction: `asc` or `desc` (default: `desc`) |
 
 ## Export Formats
 
@@ -33,7 +42,7 @@ Standard comma-separated values with headers. Includes all event fields plus fla
 **Example Request:**
 ```bash
 curl -H "X-API-Key: your-api-key" \
-  "https://api.corpus.intrace.ai/v1/corpus/events/export?format=csv&event_category=conflict&country=Nigeria" \
+  "https://api.corpus.intrace.ai/v1/corpus/events/export?format=csv&event_category=conflict&country=NG" \
   -o events.csv
 ```
 
@@ -222,7 +231,7 @@ Compatible with ACLED (Armed Conflict Location & Event Data Project) schema. **O
 **Example Request:**
 ```bash
 curl -H "X-API-Key: your-api-key" \
-  "https://api.corpus.intrace.ai/v1/corpus/events/export?format=acled&event_category=conflict&country=Nigeria&date_from=2026-01-01&date_to=2026-01-31" \
+  "https://api.corpus.intrace.ai/v1/corpus/events/export?format=acled&event_category=conflict&country=NG&date_from=2026-01-01&date_to=2026-01-31" \
   -o nigeria_conflict_acled.json
 ```
 
@@ -240,56 +249,55 @@ Denormalized JSON with actor positions as explicit columns, suitable for spreads
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `principalActor` | string | Principal (primary) actor name |
-| `principalActorCategory` | string | Category of principal (state_forces, rebel_group, etc.) |
-| `subPrincipalActors` | string | Internal sub-units of principal, semicolon-separated |
-| `supportingPrincipalActor` | string | External actors supporting principal, comma-separated |
-| `secondaryActor` | string | Secondary (opposing) actor name |
-| `secondaryActorCategory` | string | Category of secondary actor |
-| `subSecondaryActors` | string | Internal sub-units of secondary, semicolon-separated |
-| `supportingSecondaryActor` | string | External actors supporting secondary, comma-separated |
+| `principal_actor` | string | Principal (primary) actor name |
+| `principal_actor_category` | string | Category of principal (state_forces, rebel_group, etc.) |
+| `sub_principal_actors` | string | Internal sub-units of principal, semicolon-separated |
+| `supporting_principal_actor` | string | External actors supporting principal, comma-separated |
+| `secondary_actor` | string | Secondary (opposing) actor name |
+| `secondary_actor_category` | string | Category of secondary actor |
+| `sub_secondary_actors` | string | Internal sub-units of secondary, semicolon-separated |
+| `supporting_secondary_actor` | string | External actors supporting secondary, comma-separated |
 
 **Example Response:**
 ```json
 [
   {
     "id": "ad8b3d2a-353f-41fd-908d-780615f31673",
-    "investigationId": "f7e234a1-b456-4789-a012-3456789abcde",
     "title": "Armed clash between Nigerian forces and insurgents",
     "description": "Clashes erupted...",
-    "eventCategory": "conflict",
-    "eventType": "battles",
-    "eventSubtype": "armed_clash",
-    "eventDate": "2026-02-10",
-    "eventDateEnd": null,
-    "datePrecision": "day",
+    "event_category": "conflict",
+    "event_type": "battles",
+    "event_subtype": "armed_clash",
+    "event_date": "2026-02-10",
+    "event_date_end": null,
+    "date_precision": "day",
     "location": "Maiduguri, Borno State",
-    "locationCountry": "NG",
-    "locationCoordinates": {
+    "location_country": "NG",
+    "location_coordinates": {
       "lat": 11.8311,
       "lng": 13.4302
     },
-    "administrativeHierarchy": [
+    "administrative_hierarchy": [
       {"level": 1, "type": "state", "name": "Borno"},
       {"level": 2, "type": "LGA", "name": "Maiduguri"}
     ],
-    "categorySpecificData": {
+    "category_specific_data": {
       "disorder_type": "Political violence",
       "fatalities": 15,
       "injuries": 23,
       "civilian_targeting": false
     },
-    "salienceScore": 0.85,
-    "principalActor": "Nigerian Army",
-    "principalActorCategory": "state_forces",
-    "subPrincipalActors": "7th Division; 3rd Battalion",
-    "supportingPrincipalActor": "French Air Force, U.S. Military Advisors",
-    "secondaryActor": "Boko Haram",
-    "secondaryActorCategory": "rebel_group",
-    "subSecondaryActors": "Shekau Faction",
-    "supportingSecondaryActor": null,
-    "createdAt": "2026-02-10T14:30:00Z",
-    "updatedAt": "2026-02-10T14:30:00Z"
+    "salience_score": 0.85,
+    "principal_actor": "Nigerian Army",
+    "principal_actor_category": "state_forces",
+    "sub_principal_actors": "7th Division; 3rd Battalion",
+    "supporting_principal_actor": "French Air Force, U.S. Military Advisors",
+    "secondary_actor": "Boko Haram",
+    "secondary_actor_category": "rebel_group",
+    "sub_secondary_actors": "Shekau Faction",
+    "supporting_secondary_actor": null,
+    "created_at": "2026-02-10T14:30:00Z",
+    "updated_at": "2026-02-10T14:30:00Z"
   }
 ]
 ```

@@ -33,16 +33,58 @@ curl -H "X-API-Key: your-api-key-here" \
 
 The `/v1/corpus/events` endpoint supports the following filter parameters:
 
+**Categorical filters** — all accept multiple values (repeat the parameter to filter by multiple values):
+
 - **`event_category`** - Filter by category (e.g., "conflict", "cyber", "crime")
 - **`event_type`** - Filter by type within a category
-- **`country`** - Filter by country name
+- **`event_subtype`** - Filter by subtype within a type
+- **`country`** - Filter by country code
+
+**Date filters:**
+
 - **`date_from`** - Inclusive start date (YYYY-MM-DD)
 - **`date_to`** - Inclusive end date (YYYY-MM-DD)
+
+**Numeric range filters:**
+
+- **`salience_score_min`** / **`salience_score_max`** - Filter by salience score
+- **`article_count_min`** / **`article_count_max`** - Filter by number of source articles
+- **`actor_count_min`** / **`actor_count_max`** - Filter by number of actors involved
+
+**Text search:**
+
 - **`search`** - Full-text search across title and description
-- **`sort_by`** - Sort column (default: "event_date")
+
+**Sorting:**
+
+- **`sort_by`** - Sort column: `event_date` (default), `salience_score`, `article_count`, `title`, `created_at`
 - **`sort_order`** - Sort direction: "asc" or "desc" (default: "desc")
 
-**Note:** Direct filtering by `event_subtype` is not currently supported. Event subtypes are included in response data but cannot be used as a filter parameter. To find events with specific subtypes, retrieve events and filter the results client-side.
+### Multi-Value Filtering
+
+Categorical filters (`event_category`, `event_type`, `event_subtype`, `country`) accept multiple values by repeating the parameter:
+
+```python
+import requests
+
+# Filter by multiple categories and multiple countries at once
+response = requests.get(
+    "https://api.corpus.intrace.ai/v1/corpus/events",
+    headers={"X-API-Key": "your-api-key"},
+    params=[
+        ("event_category", "conflict"),
+        ("event_category", "crime"),
+        ("country", "UA"),
+        ("country", "RU"),
+    ]
+)
+```
+
+```bash
+# cURL equivalent
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/corpus/events?event_category=conflict&event_category=crime&country=UA&country=RU"
+```
 
 ### Query Events by Category
 
@@ -84,7 +126,7 @@ response = requests.get(
         "date_from": start_date.isoformat(),
         "date_to": end_date.isoformat(),
         "event_category": "conflict",
-        "country": "Ukraine"
+        "country": "UA"
     }
 )
 ```
@@ -152,7 +194,7 @@ response = requests.get(
     headers={"X-API-Key": "your-api-key"},
     params={
         "format": "geojson",
-        "country": "Syria",
+        "country": "SY",
         "event_category": "conflict"
     }
 )
@@ -186,6 +228,31 @@ print("\nCyber event types:")
 for typ in types['types']:
     print(f"- {typ['value']}: {typ['count']} events")
 ```
+
+### Available Actor Filters
+
+The `/v1/corpus/actors` endpoint supports:
+
+**Categorical filters** (multi-value, repeat parameter for multiple values):
+
+- **`actor_type`** - Filter by actor category (e.g., "rebel_group", "state_government")
+- **`country`** - Filter by actor's primary country
+
+**Numeric range filters:**
+
+- **`event_count_min`** / **`event_count_max`** - Filter by number of events the actor appears in
+- **`article_count_min`** / **`article_count_max`** - Filter by number of source articles
+
+**Text search:**
+
+- **`search`** - Search in canonical actor name
+
+**Sorting:**
+
+- **`sort_by`** - Sort column: `canonical_name` (default), `event_count`, `article_count`, `created_at`
+- **`sort_order`** - Sort direction: "asc" (default) or "desc"
+
+The `/v1/corpus/actors/{id}/events` endpoint accepts the same filter and sort parameters as `/v1/corpus/events`.
 
 ### Pagination Best Practices
 
@@ -301,7 +368,7 @@ class IntraceCorpusClient:
 
 # Usage
 client = IntraceCorpusClient(api_key="your-api-key")
-events = client.list_events(category="cyber", country="United States")
+events = client.list_events(category="cyber", country="US")
 print(f"Found {events['total']} events")
 ```
 
@@ -373,7 +440,7 @@ class IntraceCorpusClient {
 const client = new IntraceCorpusClient("your-api-key");
 const events = await client.listEvents({
   category: "political",
-  country: "France",
+  country: "FR",
 });
 console.log(`Found ${events.total} events`);
 ```
@@ -451,7 +518,7 @@ response = requests.get(
     params={
         "format": "acled",
         "event_category": "conflict",
-        "country": "Nigeria",
+        "country": "NG",
         "date_from": "2026-01-01",
         "date_to": "2026-01-31"
     }
@@ -473,10 +540,10 @@ Denormalized JSON with actor positions as explicit columns, suitable for spreads
 - **MIME type**: `application/json`
 
 **Actor Position Columns:**
-- `principalActor`, `secondaryActor`: Main actors
-- `principalActorCategory`, `secondaryActorCategory`: Actor categories (state_forces, rebel_group, etc.)
-- `subPrincipalActors`, `subSecondaryActors`: Internal sub-units (semicolon-separated)
-- `supportingPrincipalActor`, `supportingSecondaryActor`: External supporting actors (comma-separated)
+- `principal_actor`, `secondary_actor`: Main actors
+- `principal_actor_category`, `secondary_actor_category`: Actor categories (state_forces, rebel_group, etc.)
+- `sub_principal_actors`, `sub_secondary_actors`: Internal sub-units (semicolon-separated)
+- `supporting_principal_actor`, `supporting_secondary_actor`: External supporting actors (comma-separated)
 
 **Key Distinction:**
 - **Sub-actors**: Internal organizational units (e.g., "7th Division" within "Nigerian Army")
@@ -498,11 +565,11 @@ response = requests.get(
 events = response.json()
 for event in events:
     print(f"Event: {event['title']}")
-    print(f"  Principal: {event['principalActor']} ({event['principalActorCategory']})")
-    if event['subPrincipalActors']:
-        print(f"    Internal units: {event['subPrincipalActors']}")
-    if event['supportingPrincipalActor']:
-        print(f"    External support: {event['supportingPrincipalActor']}")
+    print(f"  Principal: {event['principal_actor']} ({event['principal_actor_category']})")
+    if event['sub_principal_actors']:
+        print(f"    Internal units: {event['sub_principal_actors']}")
+    if event['supporting_principal_actor']:
+        print(f"    External support: {event['supporting_principal_actor']}")
 ```
 
 ## Error Handling
