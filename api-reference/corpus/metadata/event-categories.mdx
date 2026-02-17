@@ -4,3 +4,43 @@ api: "GET /v1/metadata/event-categories"
 description: "Get all event categories with counts for filter discovery"
 ---
 
+Returns all distinct event categories in the corpus with their event counts. Use this to discover valid values for the `event_category` filter parameter.
+
+## Query Parameters
+
+No query parameters.
+
+## Response
+
+```json
+{
+  "categories": [
+    { "value": "conflict", "count": 3241 },
+    { "value": "crime", "count": 1187 },
+    { "value": "cyber", "count": 643 },
+    { "value": "political", "count": 589 },
+    { "value": "climate", "count": 412 }
+  ]
+}
+```
+
+### Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `categories` | object[] | List of category value/count pairs |
+| `categories[].value` | string | Category ID — use as `event_category` filter value |
+| `categories[].count` | integer | Number of events in this category |
+
+## Example Request
+
+```bash
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/metadata/event-categories"
+```
+
+## See Also
+
+- [Event Types](/api-reference/corpus/metadata/event-types) - Types within a category
+- [List Events](/api-reference/corpus/events/list-events) - Filter events by `event_category`
+- [Event Taxonomy](/guides/corpus-api/taxonomy) - Category definitions and subtype hierarchy

@@ -4,3 +4,42 @@ api: "GET /v1/metadata/actor-types"
 description: "Get all actor types with counts for filter discovery"
 ---
 
+Returns all distinct actor types in the corpus with their actor counts. Use this to discover valid values for the `actor_type` filter parameter when querying actors.
+
+## Query Parameters
+
+No query parameters.
+
+## Response
+
+```json
+{
+  "types": [
+    { "value": "military", "count": 312 },
+    { "value": "rebel_group", "count": 187 },
+    { "value": "state_government", "count": 143 },
+    { "value": "militia", "count": 98 },
+    { "value": "political_party", "count": 76 }
+  ]
+}
+```
+
+### Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `types` | object[] | List of actor type value/count pairs |
+| `types[].value` | string | Actor type ID — use as `actor_type` filter value |
+| `types[].count` | integer | Number of actors of this type |
+
+## Example Request
+
+```bash
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/metadata/actor-types"
+```
+
+## See Also
+
+- [List Actors](/api-reference/corpus/actors/list-actors) - Filter actors by `actor_type`
+- [Actor Types Reference](/guides/corpus-api/taxonomy/actor-types) - Definitions of each actor type

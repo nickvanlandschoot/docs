@@ -1,6 +1,69 @@
 ---
 title: "Get Event"
 api: "GET /v1/events/{event_id}"
-description: "Retrieve detailed information for a specific event"
+description: "Retrieve a single event by ID with full detail and category-specific data"
 ---
 
+Returns the full `EventDetailResponse` for a single event, including category-specific metadata and actor role breakdown.
+
+Returns `404` if the event ID does not exist.
+
+## Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `event_id` | UUID | Yes | The event's unique identifier |
+
+## Response
+
+```json
+{
+  "id": "ad8b3d2a-353f-41fd-908d-780615f31673",
+  "title": "Armed clash between government and rebel forces",
+  "description": "Clashes erupted between Nigerian military and insurgent forces in Maiduguri...",
+  "eventCategory": "conflict",
+  "eventType": "battles",
+  "eventSubtype": "armed_clash",
+  "eventDate": "2026-02-10",
+  "eventDateEnd": null,
+  "location": "Maiduguri",
+  "locationCountry": "NG",
+  "locationCoordinates": {
+    "lat": 11.8311,
+    "lng": 13.4302
+  },
+  "salienceScore": 0.85,
+  "articleCount": 3,
+  "actorCount": 2,
+  "sourceDomains": ["reuters.com", "bbc.co.uk"],
+  "createdAt": "2026-02-10T14:30:00Z",
+  "updatedAt": "2026-02-10T14:30:00Z",
+  "categorySpecificData": {
+    "disorder_type": "Political violence",
+    "fatalities": 15,
+    "injuries": 23,
+    "civilian_targeting": false
+  },
+  "actorRolesBreakdown": null
+}
+```
+
+### Additional Fields (beyond EventResponse)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `categorySpecificData` | object | Category-specific metadata (nullable). Fields vary by category — see [Event Taxonomy](/guides/corpus-api/taxonomy). |
+| `actorRolesBreakdown` | object | Breakdown of actors by role (nullable) |
+
+## Example Request
+
+```bash
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/events/ad8b3d2a-353f-41fd-908d-780615f31673"
+```
+
+## See Also
+
+- [List Events](/api-reference/corpus/events/list-events) - Query events with filters
+- [Export Events](/api-reference/corpus/events/export-events) - Bulk export
+- [Data Models](/guides/corpus-api/taxonomy/data-models) - Complete field reference

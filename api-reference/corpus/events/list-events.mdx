@@ -4,3 +4,113 @@ api: "GET /v1/events"
 description: "Query events with filtering, pagination, and sorting"
 ---
 
+Returns a paginated list of events. Categorical filters accept multiple values by repeating the parameter.
+
+## Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `page` | integer | No | Page number, starting at 1 (default: 1) |
+| `page_size` | integer | No | Results per page, 1–500 (default: 50) |
+| `event_category` | string[] | No | Filter by event category (repeatable) |
+| `event_type` | string[] | No | Filter by event type within category (repeatable) |
+| `event_subtype` | string[] | No | Filter by event subtype (repeatable) |
+| `country` | string[] | No | Filter by country code (repeatable) |
+| `date_from` | string | No | Inclusive start date (YYYY-MM-DD) |
+| `date_to` | string | No | Inclusive end date (YYYY-MM-DD) |
+| `search` | string | No | Full-text search across title and description |
+| `salience_score_min` | float | No | Minimum salience score |
+| `salience_score_max` | float | No | Maximum salience score |
+| `article_count_min` | integer | No | Minimum number of source articles (≥ 0) |
+| `article_count_max` | integer | No | Maximum number of source articles (≥ 0) |
+| `actor_count_min` | integer | No | Minimum number of actors involved (≥ 0) |
+| `actor_count_max` | integer | No | Maximum number of actors involved (≥ 0) |
+| `sort_by` | string | No | Sort column: `event_date` (default), `salience_score`, `article_count`, `title`, `created_at` |
+| `sort_order` | string | No | Sort direction: `asc` or `desc` (default: `desc`) |
+
+**Note on `sort_by`:** Unrecognised values silently fall back to `event_date`. No validation error is returned.
+
+**Note on categorical filters:** Passing an unknown value (e.g. an unrecognised `event_category`) returns an empty result set, not a 422 error.
+
+## Response
+
+```json
+{
+  "items": [
+    {
+      "id": "ad8b3d2a-353f-41fd-908d-780615f31673",
+      "title": "Armed clash in Borno State",
+      "description": "Clashes erupted between Nigerian military and insurgent forces...",
+      "eventCategory": "conflict",
+      "eventType": "battles",
+      "eventSubtype": "armed_clash",
+      "eventDate": "2026-02-10",
+      "eventDateEnd": null,
+      "location": "Maiduguri",
+      "locationCountry": "NG",
+      "locationCoordinates": {
+        "lat": 11.8311,
+        "lng": 13.4302
+      },
+      "salienceScore": 0.85,
+      "articleCount": 3,
+      "actorCount": 2,
+      "sourceDomains": ["reuters.com", "bbc.co.uk"],
+      "createdAt": "2026-02-10T14:30:00Z",
+      "updatedAt": "2026-02-10T14:30:00Z"
+    }
+  ],
+  "total": 6677,
+  "page": 1,
+  "pageSize": 50,
+  "totalPages": 134
+}
+```
+
+### Event Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Unique event identifier |
+| `title` | string | Event title/headline |
+| `description` | string | Detailed event description (nullable) |
+| `eventCategory` | string | Category ID (e.g., "conflict", "cyber") |
+| `eventType` | string | Type ID within category |
+| `eventSubtype` | string | Subtype ID within type (nullable) |
+| `eventDate` | date | Date when the event occurred, YYYY-MM-DD (nullable) |
+| `eventDateEnd` | date | End date for multi-day events (nullable) |
+| `location` | string | Specific location name (nullable) |
+| `locationCountry` | string | ISO 3166-1 alpha-2 country code (nullable) |
+| `locationCoordinates` | object | Object with `lat` and `lng` floats (nullable) |
+| `salienceScore` | float | Relevance/importance score 0.0–1.0 (nullable) |
+| `articleCount` | integer | Number of source articles |
+| `actorCount` | integer | Number of actors involved |
+| `sourceDomains` | string[] | Source domains where event was reported (nullable) |
+| `createdAt` | datetime | When the record was created |
+| `updatedAt` | datetime | When the record was last updated |
+
+## Example Requests
+
+```bash
+# Conflict events in Nigeria since 2025, sorted by salience
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/events?event_category=conflict&country=NG&date_from=2025-01-01&sort_by=salience_score&sort_order=desc"
+
+# Multiple categories and countries
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/events?event_category=conflict&event_category=crime&country=UA&country=RU"
+
+# High-salience events with at least 3 source articles
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/events?salience_score_min=0.7&article_count_min=3&sort_by=salience_score&sort_order=desc"
+
+# Full-text search
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/events?search=ransomware+attack&event_category=cyber"
+```
+
+## See Also
+
+- [Get Event](/api-reference/corpus/events/get-event) - Full event detail including category-specific data
+- [Export Events](/api-reference/corpus/events/export-events) - Bulk export in CSV, JSON, GeoJSON, ACLED, or flat format
+- [Event Taxonomy](/guides/corpus-api/taxonomy) - Valid category, type, and subtype values

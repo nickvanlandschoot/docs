@@ -4,3 +4,51 @@ api: "GET /v1/metadata/event-subtypes"
 description: "Get all event subtypes with counts, optionally filtered by type"
 ---
 
+Returns all distinct event subtypes with their event counts. Optionally filter by event type to see only the subtypes within a specific type.
+
+Use this to discover valid values for the `event_subtype` filter parameter.
+
+## Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `event_type` | string | No | Filter subtypes to a specific event type (e.g., "battles") |
+
+## Response
+
+```json
+{
+  "subtypes": [
+    { "value": "armed_clash", "count": 1102 },
+    { "value": "attack", "count": 743 },
+    { "value": "air_drone_strike", "count": 421 },
+    { "value": "abduction_forced_disappearance", "count": 214 }
+  ]
+}
+```
+
+### Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `subtypes` | object[] | List of subtype value/count pairs |
+| `subtypes[].value` | string | Subtype ID — use as `event_subtype` filter value |
+| `subtypes[].count` | integer | Number of events of this subtype |
+
+## Example Requests
+
+```bash
+# All subtypes across the corpus
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/metadata/event-subtypes"
+
+# Subtypes within battles only
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/metadata/event-subtypes?event_type=battles"
+```
+
+## See Also
+
+- [Event Types](/api-reference/corpus/metadata/event-types) - Parent types
+- [List Events](/api-reference/corpus/events/list-events) - Filter events by `event_subtype`
+- [Event Taxonomy](/guides/corpus-api/taxonomy) - Full taxonomy hierarchy

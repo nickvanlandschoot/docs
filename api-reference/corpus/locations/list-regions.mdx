@@ -4,3 +4,54 @@ api: "GET /v1/locations/regions"
 description: "Get all distinct locations/regions with event counts"
 ---
 
+Returns a list of distinct location names (cities, regions, districts) with event counts, ordered by event count descending. Optionally filtered to a single country.
+
+## Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `country` | string | No | Filter regions to a specific country (ISO 3166-1 alpha-2 code) |
+
+## Response
+
+Array of region objects, ordered by `eventCount` descending.
+
+```json
+[
+  {
+    "location": "Maiduguri",
+    "country": "NG",
+    "eventCount": 214
+  },
+  {
+    "location": "Donetsk",
+    "country": "UA",
+    "eventCount": 187
+  }
+]
+```
+
+### Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `location` | string | City or region name |
+| `country` | string | ISO 3166-1 alpha-2 country code (nullable) |
+| `eventCount` | integer | Number of events in this location |
+
+## Example Requests
+
+```bash
+# All regions globally
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/locations/regions"
+
+# Regions within Nigeria only
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/locations/regions?country=NG"
+```
+
+## See Also
+
+- [List Countries](/api-reference/corpus/locations/list-countries) - Country-level aggregations
+- [List Events](/api-reference/corpus/events/list-events) - Filter events by `country`

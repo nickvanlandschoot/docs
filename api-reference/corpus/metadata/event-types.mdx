@@ -4,3 +4,51 @@ api: "GET /v1/metadata/event-types"
 description: "Get all event types with counts, optionally filtered by category"
 ---
 
+Returns all distinct event types with their event counts. Optionally filter by category to see only the types within a specific category.
+
+Use this to discover valid values for the `event_type` filter parameter.
+
+## Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `category` | string | No | Filter types to a specific event category (e.g., "conflict") |
+
+## Response
+
+```json
+{
+  "types": [
+    { "value": "battles", "count": 1842 },
+    { "value": "violence_against_civilians", "count": 876 },
+    { "value": "explosions_remote_violence", "count": 523 },
+    { "value": "protests", "count": 412 }
+  ]
+}
+```
+
+### Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `types` | object[] | List of type value/count pairs |
+| `types[].value` | string | Type ID — use as `event_type` filter value |
+| `types[].count` | integer | Number of events of this type |
+
+## Example Requests
+
+```bash
+# All event types across the corpus
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/metadata/event-types"
+
+# Only conflict event types
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/metadata/event-types?category=conflict"
+```
+
+## See Also
+
+- [Event Categories](/api-reference/corpus/metadata/event-categories) - Top-level categories
+- [Event Subtypes](/api-reference/corpus/metadata/event-subtypes) - Subtypes within a type
+- [List Events](/api-reference/corpus/events/list-events) - Filter events by `event_type`

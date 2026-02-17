@@ -1,6 +1,62 @@
 ---
 title: "Get Actor"
 api: "GET /v1/actors/{actor_id}"
-description: "Retrieve detailed information for a specific actor"
+description: "Retrieve a single actor by ID with full detail and relationship breakdowns"
 ---
 
+Returns the full `ActorDetailResponse` for a single actor, including event type and role breakdowns.
+
+Returns `404` if the actor ID does not exist.
+
+## Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `actor_id` | UUID | Yes | The actor's unique identifier |
+
+## Response
+
+```json
+{
+  "id": "5a9c2a21-e326-4563-b425-a6490d4ccbe0",
+  "canonicalName": "Nigerian Army",
+  "aliases": ["Nigerian Armed Forces"],
+  "description": "The armed forces of the Federal Republic of Nigeria.",
+  "articleCount": 142,
+  "eventCount": 38,
+  "sourceDomains": ["reuters.com", "bbc.co.uk"],
+  "firstMentionDate": "2025-01-04",
+  "lastMentionDate": "2026-02-15",
+  "createdAt": "2026-02-04T00:26:46.088359Z",
+  "updatedAt": "2026-02-15T10:12:00.000000Z",
+  "eventTypesBreakdown": {
+    "battles": 22,
+    "violence_against_civilians": 10,
+    "explosions_remote_violence": 6
+  },
+  "rolesBreakdown": {
+    "principal": 30,
+    "secondary": 8
+  }
+}
+```
+
+### Additional Fields (beyond ActorResponse)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `eventTypesBreakdown` | object | Count of events by event type (nullable) |
+| `rolesBreakdown` | object | Count of events by actor position/role (nullable) |
+
+## Example Request
+
+```bash
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/actors/5a9c2a21-e326-4563-b425-a6490d4ccbe0"
+```
+
+## See Also
+
+- [List Actors](/api-reference/corpus/actors/list-actors) - Find actors to query
+- [List Actor Events](/api-reference/corpus/actors/list-actor-events) - Events linked to this actor
+- [Data Models](/guides/corpus-api/taxonomy/data-models) - Complete field reference

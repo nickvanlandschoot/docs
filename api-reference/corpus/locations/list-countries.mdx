@@ -4,3 +4,50 @@ api: "GET /v1/locations/countries"
 description: "Get all distinct countries with event counts"
 ---
 
+Returns a list of all countries that have at least one event in the corpus, ordered by event count descending.
+
+Use this endpoint to discover valid `country` filter values for event and actor queries.
+
+## Query Parameters
+
+No query parameters. Returns all countries.
+
+## Response
+
+Array of country objects, ordered by `eventCount` descending.
+
+```json
+[
+  {
+    "country": "NG",
+    "eventCount": 1842
+  },
+  {
+    "country": "UA",
+    "eventCount": 1204
+  },
+  {
+    "country": "SY",
+    "eventCount": 876
+  }
+]
+```
+
+### Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `country` | string | ISO 3166-1 alpha-2 country code |
+| `eventCount` | integer | Number of events in this country |
+
+## Example Request
+
+```bash
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/locations/countries"
+```
+
+## See Also
+
+- [List Regions](/api-reference/corpus/locations/list-regions) - Cities and regions within countries
+- [List Events](/api-reference/corpus/events/list-events) - Filter events by `country`
