@@ -4,13 +4,23 @@ api: "GET /v1/corpus/events/export"
 description: "Bulk export events in CSV, JSON, GeoJSON, ACLED, or flat format"
 ---
 
-Export events with optional filtering. Returns data in the specified format.
+Export all matching events in the specified format. Returns a **streaming file download**, not a JSON envelope.
+
+The response includes a `Content-Disposition: attachment; filename="events.<ext>"` header. Clients must write the response body directly to disk or a buffer — do not call `.json()` on the response.
+
+```python
+response = requests.get(url, headers=headers, params=params, stream=True)
+response.raise_for_status()
+with open("events.csv", "wb") as f:
+    for chunk in response.iter_content(chunk_size=8192):
+        f.write(chunk)
+```
 
 ## Query Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `format` | string | Yes | Export format: `csv`, `json`, `geojson`, `acled`, or `flat` |
+| `format` | string | No | Export format: `csv` (default), `json`, `geojson`, `acled`, or `flat` |
 | `event_category` | string[] | No | Filter by event category (repeatable) |
 | `event_type` | string[] | No | Filter by event type within category (repeatable) |
 | `event_subtype` | string[] | No | Filter by event subtype (repeatable) |

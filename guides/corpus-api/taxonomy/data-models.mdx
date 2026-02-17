@@ -308,14 +308,14 @@ Denormalized JSON with actor positions as explicit columns, suitable for spreads
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `principalActor` | string | Principal (primary) actor name |
-| `principalActorCategory` | string | Category of principal actor (state_forces, rebel_group, etc.) |
-| `subPrincipalActors` | string | Internal sub-units of principal actor, semicolon-separated |
-| `supportingPrincipalActor` | string | External actors supporting principal, comma-separated |
-| `secondaryActor` | string | Secondary (opposing) actor name |
-| `secondaryActorCategory` | string | Category of secondary actor |
-| `subSecondaryActors` | string | Internal sub-units of secondary actor, semicolon-separated |
-| `supportingSupportingActor` | string | External actors supporting secondary, comma-separated |
+| `principal_actor` | string | Principal (primary) actor name |
+| `principal_actor_category` | string | Category of principal actor (state_forces, rebel_group, etc.) |
+| `sub_principal_actors` | string | Internal sub-units of principal actor, semicolon-separated |
+| `supporting_principal_actor` | string | External actors supporting principal, comma-separated |
+| `secondary_actor` | string | Secondary (opposing) actor name |
+| `secondary_actor_category` | string | Category of secondary actor |
+| `sub_secondary_actors` | string | Internal sub-units of secondary actor, semicolon-separated |
+| `supporting_secondary_actor` | string | External actors supporting secondary, comma-separated |
 
 **Actor Position Hierarchy:**
 
@@ -328,23 +328,23 @@ Denormalized JSON with actor positions as explicit columns, suitable for spreads
 {
   "id": "ad8b3d2a-353f-41fd-908d-780615f31673",
   "title": "Armed clash between Nigerian forces and insurgents",
-  "eventCategory": "conflict",
-  "eventType": "battles",
-  "eventSubtype": "armed_clash",
-  "eventDate": "2026-02-10",
+  "event_category": "conflict",
+  "event_type": "battles",
+  "event_subtype": "armed_clash",
+  "event_date": "2026-02-10",
   "location": "Maiduguri, Borno State",
-  "locationCountry": "NG",
-  "principalActor": "Nigerian Army",
-  "principalActorCategory": "state_forces",
-  "subPrincipalActors": "7th Division; 3rd Battalion",
-  "supportingPrincipalActor": "French Air Force, U.S. Military Advisors",
-  "secondaryActor": "Boko Haram",
-  "secondaryActorCategory": "rebel_group",
-  "subSecondaryActors": "Shekau Faction",
-  "supportingSecondaryActor": null,
-  "salienceScore": 0.85,
-  "createdAt": "2026-02-10T14:30:00Z",
-  "updatedAt": "2026-02-10T14:30:00Z"
+  "location_country": "NG",
+  "principal_actor": "Nigerian Army",
+  "principal_actor_category": "state_forces",
+  "sub_principal_actors": "7th Division; 3rd Battalion",
+  "supporting_principal_actor": "French Air Force, U.S. Military Advisors",
+  "secondary_actor": "Boko Haram",
+  "secondary_actor_category": "rebel_group",
+  "sub_secondary_actors": "Shekau Faction",
+  "supporting_secondary_actor": null,
+  "salience_score": 0.85,
+  "created_at": "2026-02-10T14:30:00Z",
+  "updated_at": "2026-02-10T14:30:00Z"
 }
 ```
 

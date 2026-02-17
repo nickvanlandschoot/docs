@@ -60,6 +60,8 @@ The `/v1/corpus/events` endpoint supports the following filter parameters:
 - **`sort_by`** - Sort column: `event_date` (default), `salience_score`, `article_count`, `title`, `created_at`
 - **`sort_order`** - Sort direction: "asc" or "desc" (default: "desc")
 
+**Note:** An unrecognised `sort_by` value silently falls back to `event_date`. No validation error is returned — double-check spellings if results appear sorted unexpectedly.
+
 ### Multi-Value Filtering
 
 Categorical filters (`event_category`, `event_type`, `event_subtype`, `country`) accept multiple values by repeating the parameter:
@@ -173,7 +175,7 @@ if event.get('categorySpecificData'):
 Export filtered events in various formats:
 
 ```python
-# Export as CSV
+# Export as CSV — use stream=True and iter_content; do not call .json()
 response = requests.get(
     "https://api.corpus.intrace.ai/v1/corpus/events/export",
     headers={"X-API-Key": "your-api-key"},
@@ -182,13 +184,15 @@ response = requests.get(
         "event_category": "political",
         "date_from": "2026-01-01",
         "date_to": "2026-01-31"
-    }
+    },
+    stream=True
 )
-
+response.raise_for_status()
 with open("political_events_jan2026.csv", "wb") as f:
-    f.write(response.content)
+    for chunk in response.iter_content(chunk_size=8192):
+        f.write(chunk)
 
-# Export as GeoJSON for mapping
+# Export as GeoJSON — same streaming pattern; do not call .json()
 response = requests.get(
     "https://api.corpus.intrace.ai/v1/corpus/events/export",
     headers={"X-API-Key": "your-api-key"},
@@ -196,10 +200,13 @@ response = requests.get(
         "format": "geojson",
         "country": "SY",
         "event_category": "conflict"
-    }
+    },
+    stream=True
 )
-
-geojson_data = response.json()
+response.raise_for_status()
+with open("syria_conflict.geojson", "wb") as f:
+    for chunk in response.iter_content(chunk_size=8192):
+        f.write(chunk)
 ```
 
 ### Discover Filter Values
@@ -252,6 +259,8 @@ The `/v1/corpus/actors` endpoint supports:
 - **`sort_by`** - Sort column: `canonical_name` (default), `event_count`, `article_count`, `created_at`
 - **`sort_order`** - Sort direction: "asc" (default) or "desc"
 
+**Note:** An unrecognised `sort_by` value silently falls back to `canonical_name`. No validation error is returned.
+
 The `/v1/corpus/actors/{id}/events` endpoint accepts the same filter and sort parameters as `/v1/corpus/events`.
 
 ### Pagination Best Practices
@@ -290,6 +299,142 @@ all_cyber_events = get_all_events("cyber")
 print(f"Retrieved {len(all_cyber_events)} cyber events")
 ```
 
+### Paginating Actors
+
+The same pagination pattern applies to actors:
+
+```python
+def get_all_actors(actor_types: list[str] = None, country: list[str] = None) -> list:
+    """Fetch all actors matching optional filters."""
+    all_actors = []
+    page = 1
+    params = {"page_size": 500}
+    if actor_types:
+        params["actor_type"] = actor_types
+    if country:
+        params["country"] = country
+
+    while True:
+        params["page"] = page
+        response = requests.get(
+            "https://api.corpus.intrace.ai/v1/corpus/actors",
+            headers={"X-API-Key": "your-api-key"},
+            params=params
+        )
+        data = response.json()
+        all_actors.extend(data["items"])
+
+        if page >= data["totalPages"]:
+            break
+        page += 1
+
+    return all_actors
+
+# All rebel groups and militias in Nigeria
+actors = get_all_actors(actor_types=["rebel_group", "militia"], country=["NG"])
+print(f"Retrieved {len(actors)} actors")
+```
+
+## End-to-End Workflow Example
+
+This example shows a complete analyst workflow: discover valid filter values, query high-salience conflict events in a region, then pull the event history for the most active actor involved.
+
+```python
+import requests
+
+BASE_URL = "https://api.corpus.intrace.ai"
+HEADERS = {"X-API-Key": "your-api-key"}
+
+# Step 1: Discover available event types for conflict
+types = requests.get(
+    f"{BASE_URL}/v1/corpus/metadata/event-types",
+    headers=HEADERS,
+    params={"category": "conflict"}
+).json()
+print("Conflict types:", [t["value"] for t in types["types"]])
+
+# Step 2: Query high-salience conflict events in the Sahel region
+response = requests.get(
+    f"{BASE_URL}/v1/corpus/events",
+    headers=HEADERS,
+    params=[
+        ("event_category", "conflict"),
+        ("country", "ML"),
+        ("country", "BF"),
+        ("country", "NE"),
+        ("date_from", "2025-01-01"),
+        ("salience_score_min", "0.6"),
+        ("sort_by", "salience_score"),
+        ("sort_order", "desc"),
+        ("page_size", "20"),
+    ]
+)
+events = response.json()
+print(f"Found {events['total']} high-salience conflict events in the Sahel")
+
+# Step 3: Find the most-mentioned actor across these events
+from collections import Counter
+actor_counts = Counter()
+for event in events["items"]:
+    event_detail = requests.get(
+        f"{BASE_URL}/v1/corpus/events/{event['id']}",
+        headers=HEADERS
+    ).json()
+    # categorySpecificData may contain actor breakdown depending on event type
+
+# Step 4: Find actors with high event counts in the region
+actors = requests.get(
+    f"{BASE_URL}/v1/corpus/actors",
+    headers=HEADERS,
+    params=[
+        ("actor_type", "rebel_group"),
+        ("actor_type", "militia"),
+        ("country", "ML"),
+        ("event_count_min", "10"),
+        ("sort_by", "event_count"),
+        ("sort_order", "desc"),
+    ]
+).json()
+
+top_actor = actors["items"][0] if actors["items"] else None
+if top_actor:
+    print(f"Top actor: {top_actor['canonicalName']} ({top_actor['eventCount']} events)")
+
+    # Step 5: Get that actor's conflict events since 2025, sorted by salience
+    actor_events = requests.get(
+        f"{BASE_URL}/v1/corpus/actors/{top_actor['id']}/events",
+        headers=HEADERS,
+        params={
+            "event_category": "conflict",
+            "date_from": "2025-01-01",
+            "sort_by": "salience_score",
+            "sort_order": "desc",
+            "page_size": "50",
+        }
+    ).json()
+    print(f"  {actor_events['total']} conflict events found")
+    for e in actor_events["items"][:5]:
+        print(f"  - [{e['eventDate']}] {e['title']}")
+
+    # Step 6: Export actor's events as CSV for offline analysis
+    csv_response = requests.get(
+        f"{BASE_URL}/v1/corpus/events/export",
+        headers=HEADERS,
+        params={
+            "format": "csv",
+            "event_category": "conflict",
+            "date_from": "2025-01-01",
+            "sort_by": "salience_score",
+            "sort_order": "desc",
+        },
+        stream=True
+    )
+    with open(f"actor_conflict_events.csv", "wb") as f:
+        for chunk in csv_response.iter_content(chunk_size=8192):
+            f.write(chunk)
+    print("Exported to actor_conflict_events.csv")
+```
+
 ## Code Examples
 
 ### Python
@@ -298,7 +443,7 @@ Complete example using the requests library:
 
 ```python
 import requests
-from typing import List, Dict, Any
+from typing import Any, Dict, List, Optional
 
 class IntraceCorpusClient:
     def __init__(self, api_key: str, base_url: str = "https://api.corpus.intrace.ai"):
@@ -308,35 +453,45 @@ class IntraceCorpusClient:
 
     def list_events(
         self,
-        category: str = None,
-        event_type: str = None,
-        country: str = None,
-        date_from: str = None,
-        date_to: str = None,
+        event_category: Optional[List[str]] = None,
+        event_type: Optional[List[str]] = None,
+        country: Optional[List[str]] = None,
+        date_from: Optional[str] = None,
+        date_to: Optional[str] = None,
+        salience_score_min: Optional[float] = None,
+        sort_by: str = "event_date",
+        sort_order: str = "desc",
         page: int = 1,
-        page_size: int = 50
+        page_size: int = 50,
     ) -> Dict[str, Any]:
-        """List events with optional filters."""
-        params = {
-            "page": page,
-            "page_size": page_size
-        }
+        """List events with optional filters.
 
-        if category:
-            params["event_category"] = category
-        if event_type:
-            params["event_type"] = event_type
-        if country:
-            params["country"] = country
+        Multi-value params (event_category, event_type, country) are passed
+        as a list of tuples so requests sends repeated query params correctly.
+        """
+        params: List[tuple] = [
+            ("page", page),
+            ("page_size", page_size),
+            ("sort_by", sort_by),
+            ("sort_order", sort_order),
+        ]
+        for v in (event_category or []):
+            params.append(("event_category", v))
+        for v in (event_type or []):
+            params.append(("event_type", v))
+        for v in (country or []):
+            params.append(("country", v))
         if date_from:
-            params["date_from"] = date_from
+            params.append(("date_from", date_from))
         if date_to:
-            params["date_to"] = date_to
+            params.append(("date_to", date_to))
+        if salience_score_min is not None:
+            params.append(("salience_score_min", salience_score_min))
 
         response = requests.get(
             f"{self.base_url}/v1/corpus/events",
             headers=self.headers,
-            params=params
+            params=params,
         )
         response.raise_for_status()
         return response.json()
@@ -352,29 +507,43 @@ class IntraceCorpusClient:
 
     def export_events(
         self,
+        output_path: str,
         format: str = "csv",
         **filters
-    ) -> bytes:
-        """Export events in specified format."""
+    ) -> None:
+        """Export events in specified format, streaming response to a file.
+
+        The export endpoint returns a file download — do not call .json() on the
+        response. Always stream the body to disk using iter_content.
+        """
         params = {"format": format, **filters}
 
         response = requests.get(
             f"{self.base_url}/v1/corpus/events/export",
             headers=self.headers,
-            params=params
+            params=params,
+            stream=True
         )
         response.raise_for_status()
-        return response.content
+        with open(output_path, "wb") as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
 
 # Usage
 client = IntraceCorpusClient(api_key="your-api-key")
-events = client.list_events(category="cyber", country="US")
+events = client.list_events(
+    event_category=["cyber", "crime"],
+    country=["US"],
+    salience_score_min=0.5,
+    sort_by="salience_score",
+    sort_order="desc",
+)
 print(f"Found {events['total']} events")
 ```
 
 ### JavaScript/TypeScript
 
-Example using fetch API:
+Example using fetch API. Note that multi-value filters require `append` not `set` on `URLSearchParams`:
 
 ```typescript
 class IntraceCorpusClient {
@@ -383,66 +552,122 @@ class IntraceCorpusClient {
     private baseUrl: string = "https://api.corpus.intrace.ai"
   ) {}
 
+  private get headers() {
+    return { "X-API-Key": this.apiKey };
+  }
+
   async listEvents(params: {
-    category?: string;
-    eventType?: string;
-    country?: string;
+    eventCategory?: string | string[];
+    eventType?: string | string[];
+    eventSubtype?: string | string[];
+    country?: string | string[];
     dateFrom?: string;
     dateTo?: string;
+    search?: string;
+    salienceScoreMin?: number;
+    salienceScoreMax?: number;
+    articleCountMin?: number;
+    articleCountMax?: number;
+    actorCountMin?: number;
+    actorCountMax?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
     page?: number;
     pageSize?: number;
   }): Promise<any> {
-    const queryParams = new URLSearchParams();
+    const q = new URLSearchParams();
 
-    if (params.category) queryParams.set("event_category", params.category);
-    if (params.eventType) queryParams.set("event_type", params.eventType);
-    if (params.country) queryParams.set("country", params.country);
-    if (params.dateFrom) queryParams.set("date_from", params.dateFrom);
-    if (params.dateTo) queryParams.set("date_to", params.dateTo);
-    queryParams.set("page", String(params.page || 1));
-    queryParams.set("page_size", String(params.pageSize || 50));
+    // Multi-value params — always use append so repeated keys work correctly
+    const appendMulti = (key: string, val?: string | string[]) => {
+      if (!val) return;
+      (Array.isArray(val) ? val : [val]).forEach(v => q.append(key, v));
+    };
 
-    const response = await fetch(
-      `${this.baseUrl}/v1/corpus/events?${queryParams}`,
-      {
-        headers: {
-          "X-API-Key": this.apiKey,
-        },
-      }
-    );
+    appendMulti("event_category", params.eventCategory);
+    appendMulti("event_type", params.eventType);
+    appendMulti("event_subtype", params.eventSubtype);
+    appendMulti("country", params.country);
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
-    }
+    if (params.dateFrom) q.set("date_from", params.dateFrom);
+    if (params.dateTo) q.set("date_to", params.dateTo);
+    if (params.search) q.set("search", params.search);
+    if (params.salienceScoreMin != null) q.set("salience_score_min", String(params.salienceScoreMin));
+    if (params.salienceScoreMax != null) q.set("salience_score_max", String(params.salienceScoreMax));
+    if (params.articleCountMin != null) q.set("article_count_min", String(params.articleCountMin));
+    if (params.articleCountMax != null) q.set("article_count_max", String(params.articleCountMax));
+    if (params.actorCountMin != null) q.set("actor_count_min", String(params.actorCountMin));
+    if (params.actorCountMax != null) q.set("actor_count_max", String(params.actorCountMax));
+    if (params.sortBy) q.set("sort_by", params.sortBy);
+    if (params.sortOrder) q.set("sort_order", params.sortOrder);
+    q.set("page", String(params.page ?? 1));
+    q.set("page_size", String(params.pageSize ?? 50));
 
+    const response = await fetch(`${this.baseUrl}/v1/corpus/events?${q}`, {
+      headers: this.headers,
+    });
+    if (!response.ok) throw new Error(`API error ${response.status}: ${response.statusText}`);
     return response.json();
   }
 
   async getEvent(eventId: string): Promise<any> {
-    const response = await fetch(
-      `${this.baseUrl}/v1/corpus/events/${eventId}`,
-      {
-        headers: {
-          "X-API-Key": this.apiKey,
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
-    }
-
+    const response = await fetch(`${this.baseUrl}/v1/corpus/events/${eventId}`, {
+      headers: this.headers,
+    });
+    if (!response.ok) throw new Error(`API error ${response.status}: ${response.statusText}`);
     return response.json();
+  }
+
+  async exportEvents(params: {
+    format?: "csv" | "json" | "geojson" | "acled" | "flat";
+    eventCategory?: string | string[];
+    country?: string | string[];
+    dateFrom?: string;
+    dateTo?: string;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }): Promise<Blob> {
+    const q = new URLSearchParams();
+    if (params.format) q.set("format", params.format);
+    const appendMulti = (key: string, val?: string | string[]) => {
+      if (!val) return;
+      (Array.isArray(val) ? val : [val]).forEach(v => q.append(key, v));
+    };
+    appendMulti("event_category", params.eventCategory);
+    appendMulti("country", params.country);
+    if (params.dateFrom) q.set("date_from", params.dateFrom);
+    if (params.dateTo) q.set("date_to", params.dateTo);
+    if (params.sortBy) q.set("sort_by", params.sortBy);
+    if (params.sortOrder) q.set("sort_order", params.sortOrder);
+
+    const response = await fetch(`${this.baseUrl}/v1/corpus/events/export?${q}`, {
+      headers: this.headers,
+    });
+    if (!response.ok) throw new Error(`API error ${response.status}: ${response.statusText}`);
+    return response.blob(); // write to disk or pass to a download link
   }
 }
 
 // Usage
 const client = new IntraceCorpusClient("your-api-key");
+
+// Multi-value filter
 const events = await client.listEvents({
-  category: "political",
-  country: "FR",
+  eventCategory: ["conflict", "crime"],
+  country: ["UA", "RU"],
+  salienceScoreMin: 0.5,
+  sortBy: "salience_score",
+  sortOrder: "desc",
 });
 console.log(`Found ${events.total} events`);
+
+// Export as CSV (returns a Blob, not JSON)
+const blob = await client.exportEvents({
+  format: "csv",
+  eventCategory: "conflict",
+  dateFrom: "2025-01-01",
+  sortBy: "salience_score",
+  sortOrder: "desc",
+});
 ```
 
 ### cURL
@@ -511,6 +736,8 @@ Compatible with ACLED (Armed Conflict Location & Event Data Project) schema. **O
 
 **Example:**
 ```python
+import json
+
 # Export conflict events in ACLED format
 response = requests.get(
     "https://api.corpus.intrace.ai/v1/corpus/events/export",
@@ -521,10 +748,17 @@ response = requests.get(
         "country": "NG",
         "date_from": "2026-01-01",
         "date_to": "2026-01-31"
-    }
+    },
+    stream=True
 )
+response.raise_for_status()
+with open("nigeria_conflict_acled.json", "wb") as f:
+    for chunk in response.iter_content(chunk_size=8192):
+        f.write(chunk)
 
-events = response.json()
+# Parse after saving
+with open("nigeria_conflict_acled.json") as f:
+    events = json.load(f)
 for event in events:
     print(f"{event['event_date']}: {event['actor1']} vs {event['actor2']}")
     if event['supporting_actor_1']:
@@ -551,6 +785,8 @@ Denormalized JSON with actor positions as explicit columns, suitable for spreads
 
 **Example:**
 ```python
+import json
+
 # Export in flat format for spreadsheet analysis
 response = requests.get(
     "https://api.corpus.intrace.ai/v1/corpus/events/export",
@@ -559,10 +795,16 @@ response = requests.get(
         "format": "flat",
         "event_category": "conflict",
         "date_from": "2026-01-01"
-    }
+    },
+    stream=True
 )
+response.raise_for_status()
+with open("conflict_events_flat.json", "wb") as f:
+    for chunk in response.iter_content(chunk_size=8192):
+        f.write(chunk)
 
-events = response.json()
+with open("conflict_events_flat.json") as f:
+    events = json.load(f)
 for event in events:
     print(f"Event: {event['title']}")
     print(f"  Principal: {event['principal_actor']} ({event['principal_actor_category']})")
@@ -574,27 +816,29 @@ for event in events:
 
 ## Error Handling
 
-The API uses standard HTTP status codes:
-
-| Code | Meaning | Description |
-|------|---------|-------------|
-| 200 | Success | Request completed successfully |
-| 400 | Bad Request | Invalid parameters or malformed request |
-| 401 | Unauthorized | Missing or invalid API key |
-| 404 | Not Found | Resource not found (e.g., event ID doesn't exist) |
-| 422 | Validation Error | Request parameters failed validation |
-| 429 | Rate Limited | Too many requests (contact support for rate limit increase) |
-| 500 | Server Error | Internal server error (contact support if persistent) |
-
-Example error response:
+The API uses standard HTTP status codes. All error responses share the same body shape:
 
 ```json
 {
-  "detail": "Event not found"
+  "detail": "human-readable message"
 }
 ```
 
-Python error handling:
+| Code | Meaning | Example `detail` |
+|------|---------|-----------------|
+| 200 | Success | — |
+| 401 | Unauthorized | `"Invalid or missing API key"` |
+| 404 | Not Found | `"Event not found"` |
+| 422 | Validation Error | `"value is not a valid integer"` |
+| 429 | Rate Limited | `"Rate limit exceeded"` |
+| 500 | Server Error | `"Internal server error"` |
+
+**401 responses** are returned when the `X-API-Key` header is absent, empty, or does not match any active key. There is no distinction between a missing and an invalid key in the response body.
+
+**422 responses** are returned for type validation failures (e.g., passing `"abc"` as `article_count_min`). They do not fire for unrecognised categorical values — passing an unknown `event_category` returns an empty result set, not an error.
+
+**Silent fallbacks** — two parameters degrade gracefully instead of returning 422:
+- An unrecognised `sort_by` value silently falls back to the default sort column for that endpoint (`event_date` for events, `canonical_name` for actors).
 
 ```python
 try:
@@ -605,12 +849,18 @@ try:
     response.raise_for_status()
     event = response.json()
 except requests.exceptions.HTTPError as e:
-    if e.response.status_code == 404:
-        print(f"Event {event_id} not found")
-    elif e.response.status_code == 401:
-        print("Invalid API key")
+    status = e.response.status_code
+    detail = e.response.json().get("detail", "unknown error")
+    if status == 401:
+        raise RuntimeError(f"Authentication failed: {detail}")
+    elif status == 404:
+        raise RuntimeError(f"Not found: {detail}")
+    elif status == 422:
+        raise ValueError(f"Invalid parameters: {detail}")
+    elif status == 429:
+        raise RuntimeError(f"Rate limited — retry after backoff")
     else:
-        print(f"API error: {e}")
+        raise RuntimeError(f"API error {status}: {detail}")
 ```
 
 ## Rate Limits
@@ -618,6 +868,24 @@ except requests.exceptions.HTTPError as e:
 Default rate limits:
 - **100 requests per minute** per API key
 - **10,000 requests per day** per API key
+
+The API does not currently return rate limit headers (`X-RateLimit-Remaining`, `Retry-After`). Implement exponential backoff on 429 responses rather than relying on header-based scheduling.
+
+```python
+import time
+
+def get_with_backoff(url: str, headers: dict, params: dict, max_retries: int = 3) -> dict:
+    """GET request with exponential backoff on 429."""
+    for attempt in range(max_retries):
+        response = requests.get(url, headers=headers, params=params)
+        if response.status_code == 429:
+            wait = 2 ** attempt
+            time.sleep(wait)
+            continue
+        response.raise_for_status()
+        return response.json()
+    raise RuntimeError("Exceeded max retries due to rate limiting")
+```
 
 Contact support if you need higher limits for your use case.
 

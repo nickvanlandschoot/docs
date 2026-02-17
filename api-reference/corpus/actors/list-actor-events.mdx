@@ -1,6 +1,86 @@
 ---
 title: "List Actor Events"
 api: "GET /v1/corpus/actors/{actor_id}/events"
-description: "Get all events involving a specific actor"
+description: "Get events linked to a specific actor, with full event filtering and sorting"
 ---
 
+Returns a paginated list of events involving the specified actor. Accepts the same filter and sort parameters as [List Events](/api-reference/corpus/events/list-events), applied on top of the actor constraint.
+
+Returns `404` if the actor ID does not exist.
+
+## Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `actor_id` | UUID | Yes | The actor's unique identifier |
+
+## Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `page` | integer | No | Page number, starting at 1 (default: 1) |
+| `page_size` | integer | No | Results per page, 1–500 (default: 50) |
+| `event_category` | string[] | No | Filter by event category (repeatable) |
+| `event_type` | string[] | No | Filter by event type (repeatable) |
+| `event_subtype` | string[] | No | Filter by event subtype (repeatable) |
+| `country` | string[] | No | Filter by country code (repeatable) |
+| `date_from` | string | No | Inclusive start date (YYYY-MM-DD) |
+| `date_to` | string | No | Inclusive end date (YYYY-MM-DD) |
+| `search` | string | No | Search in title/description |
+| `salience_score_min` | float | No | Minimum salience score |
+| `salience_score_max` | float | No | Maximum salience score |
+| `article_count_min` | integer | No | Minimum article count (≥ 0) |
+| `article_count_max` | integer | No | Maximum article count (≥ 0) |
+| `actor_count_min` | integer | No | Minimum actor count (≥ 0) |
+| `actor_count_max` | integer | No | Maximum actor count (≥ 0) |
+| `sort_by` | string | No | Sort column: `event_date` (default), `salience_score`, `article_count`, `title`, `created_at` |
+| `sort_order` | string | No | Sort direction: `asc` or `desc` (default: `desc`) |
+
+**Note on `sort_by`:** Unrecognised values silently fall back to `event_date`. No validation error is returned.
+
+## Response
+
+Same structure as [List Events](/api-reference/corpus/events/list-events) — a paginated `EventResponse` list.
+
+```json
+{
+  "items": [
+    {
+      "id": "ad8b3d2a-353f-41fd-908d-780615f31673",
+      "title": "Armed clash in Borno State",
+      "eventCategory": "conflict",
+      "eventType": "battles",
+      "eventSubtype": "armed_clash",
+      "eventDate": "2026-02-10",
+      "locationCountry": "NG",
+      "salienceScore": 0.85,
+      "articleCount": 3,
+      "actorCount": 2,
+      "createdAt": "2026-02-10T14:30:00Z",
+      "updatedAt": "2026-02-10T14:30:00Z"
+    }
+  ],
+  "total": 38,
+  "page": 1,
+  "pageSize": 50,
+  "totalPages": 1
+}
+```
+
+## Example Requests
+
+```bash
+# Most salient conflict events for an actor since 2025
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/corpus/actors/5a9c2a21-e326-4563-b425-a6490d4ccbe0/events?event_category=conflict&date_from=2025-01-01&sort_by=salience_score&sort_order=desc"
+
+# Events in multiple countries
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/corpus/actors/5a9c2a21-e326-4563-b425-a6490d4ccbe0/events?country=NG&country=NE&sort_by=event_date"
+```
+
+## See Also
+
+- [List Actors](/api-reference/corpus/actors/list-actors) - Find actors to query
+- [Get Actor](/api-reference/corpus/actors/get-actor) - Full actor detail
+- [List Events](/api-reference/corpus/events/list-events) - Event filter reference

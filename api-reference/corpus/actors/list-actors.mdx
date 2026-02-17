@@ -4,3 +4,86 @@ api: "GET /v1/corpus/actors"
 description: "Query actors with filtering, pagination, and sorting"
 ---
 
+Returns a paginated list of actors. Categorical filters accept multiple values by repeating the parameter.
+
+## Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `page` | integer | No | Page number, starting at 1 (default: 1) |
+| `page_size` | integer | No | Results per page, 1–500 (default: 50) |
+| `actor_type` | string[] | No | Filter by actor category (repeatable) |
+| `country` | string[] | No | Filter by actor's primary country (repeatable) |
+| `search` | string | No | Search in canonical actor name |
+| `event_count_min` | integer | No | Minimum number of events the actor appears in (≥ 0) |
+| `event_count_max` | integer | No | Maximum number of events (≥ 0) |
+| `article_count_min` | integer | No | Minimum number of source articles (≥ 0) |
+| `article_count_max` | integer | No | Maximum number of source articles (≥ 0) |
+| `sort_by` | string | No | Sort column: `canonical_name` (default), `event_count`, `article_count`, `created_at` |
+| `sort_order` | string | No | Sort direction: `asc` (default) or `desc` |
+
+**Note on `sort_by`:** Unrecognised values silently fall back to `canonical_name`. No validation error is returned.
+
+## Response
+
+```json
+{
+  "items": [
+    {
+      "id": "5a9c2a21-e326-4563-b425-a6490d4ccbe0",
+      "canonicalName": "Nigerian Army",
+      "aliases": ["Nigerian Armed Forces"],
+      "description": "The armed forces of the Federal Republic of Nigeria.",
+      "articleCount": 142,
+      "eventCount": 38,
+      "sourceDomains": ["reuters.com", "bbc.co.uk"],
+      "firstMentionDate": "2025-01-04",
+      "lastMentionDate": "2026-02-15",
+      "createdAt": "2026-02-04T00:26:46.088359Z",
+      "updatedAt": "2026-02-15T10:12:00.000000Z"
+    }
+  ],
+  "total": 284,
+  "page": 1,
+  "pageSize": 50,
+  "totalPages": 6
+}
+```
+
+### Actor Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Unique actor identifier |
+| `canonicalName` | string | Actor's canonical/standardised name |
+| `aliases` | string[] | Alternative names and spellings (nullable) |
+| `description` | string | Description of the actor (nullable) |
+| `articleCount` | integer | Number of source articles mentioning this actor |
+| `eventCount` | integer | Number of events this actor is linked to |
+| `sourceDomains` | string[] | Source domains where actor is mentioned (nullable) |
+| `firstMentionDate` | date | Date of first mention in corpus (nullable) |
+| `lastMentionDate` | date | Date of most recent mention (nullable) |
+| `createdAt` | datetime | When the actor record was created |
+| `updatedAt` | datetime | When the actor record was last updated |
+
+## Example Requests
+
+```bash
+# Actors with high event counts, sorted by activity
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/corpus/actors?event_count_min=10&sort_by=event_count&sort_order=desc"
+
+# Multiple actor types in a specific country
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/corpus/actors?actor_type=rebel_group&actor_type=militia&country=SY"
+
+# Search by name
+curl -H "X-API-Key: your-api-key" \
+  "https://api.corpus.intrace.ai/v1/corpus/actors?search=boko+haram"
+```
+
+## See Also
+
+- [Get Actor](/api-reference/corpus/actors/get-actor) - Full actor detail
+- [List Actor Events](/api-reference/corpus/actors/list-actor-events) - Events linked to an actor
+- [Actor Types](/guides/corpus-api/taxonomy/actor-types) - Valid `actor_type` values
