@@ -125,7 +125,7 @@ The standard actor object returned by list endpoints.
 | `createdAt` | datetime | When record was created |
 | `updatedAt` | datetime | When record was last updated |
 
-**Note:** The actor type/category is not included in the response object. To filter actors by type, use the `actor_type` query parameter when calling `/v1/corpus/actors`, and use the `/v1/corpus/metadata/actor-types` endpoint to discover available types.
+**Note:** The actor type/category is not included in the response object. To filter actors by type, use the `actor_type` query parameter when calling `/v1/actors`, and use the `/v1/metadata/actor-types` endpoint to discover available types.
 
 ### Example JSON
 
@@ -218,14 +218,14 @@ Generic metadata value with count.
 | `count` | integer | Number of occurrences |
 
 Used in responses from:
-- `/v1/corpus/metadata/event-categories`
-- `/v1/corpus/metadata/event-types`
-- `/v1/corpus/metadata/event-subtypes`
-- `/v1/corpus/metadata/actor-types`
+- `/v1/metadata/event-categories`
+- `/v1/metadata/event-types`
+- `/v1/metadata/event-subtypes`
+- `/v1/metadata/actor-types`
 
 ## Export Formats
 
-The `/v1/corpus/events/export` endpoint supports multiple output formats:
+The `/v1/events/export` endpoint supports multiple output formats:
 
 ### CSV Format
 

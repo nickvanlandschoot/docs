@@ -1,6 +1,6 @@
 ---
 title: "List Actor Events"
-api: "GET /v1/corpus/actors/{actor_id}/events"
+api: "GET /v1/actors/{actor_id}/events"
 description: "Get events linked to a specific actor, with full event filtering and sorting"
 ---
 
@@ -72,11 +72,11 @@ Same structure as [List Events](/api-reference/corpus/events/list-events) — a 
 ```bash
 # Most salient conflict events for an actor since 2025
 curl -H "X-API-Key: your-api-key" \
-  "https://api.corpus.intrace.ai/v1/corpus/actors/5a9c2a21-e326-4563-b425-a6490d4ccbe0/events?event_category=conflict&date_from=2025-01-01&sort_by=salience_score&sort_order=desc"
+  "https://api.corpus.intrace.ai/v1/actors/5a9c2a21-e326-4563-b425-a6490d4ccbe0/events?event_category=conflict&date_from=2025-01-01&sort_by=salience_score&sort_order=desc"
 
 # Events in multiple countries
 curl -H "X-API-Key: your-api-key" \
-  "https://api.corpus.intrace.ai/v1/corpus/actors/5a9c2a21-e326-4563-b425-a6490d4ccbe0/events?country=NG&country=NE&sort_by=event_date"
+  "https://api.corpus.intrace.ai/v1/actors/5a9c2a21-e326-4563-b425-a6490d4ccbe0/events?country=NG&country=NE&sort_by=event_date"
 ```
 
 ## See Also

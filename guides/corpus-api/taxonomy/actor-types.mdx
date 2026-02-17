@@ -31,7 +31,7 @@ import requests
 
 # Get all government actors
 response = requests.get(
-    "https://api.corpus.intrace.ai/v1/corpus/actors",
+    "https://api.corpus.intrace.ai/v1/actors",
     headers={"X-API-Key": "your-api-key"},
     params={"actor_type": "state_government"}
 )
@@ -44,7 +44,7 @@ Use the metadata endpoint to see all actor types currently in the corpus:
 ```python
 # Get all actor types with counts
 response = requests.get(
-    "https://api.corpus.intrace.ai/v1/corpus/metadata/actor-types",
+    "https://api.corpus.intrace.ai/v1/metadata/actor-types",
     headers={"X-API-Key": "your-api-key"}
 )
 actor_types = response.json()
@@ -181,7 +181,7 @@ The events endpoint does not filter directly by actor type, but you can combine 
 ```python
 # Step 1: Find all rebel group actors in a country with event activity
 actors_response = requests.get(
-    "https://api.corpus.intrace.ai/v1/corpus/actors",
+    "https://api.corpus.intrace.ai/v1/actors",
     headers={"X-API-Key": "your-api-key"},
     params=[
         ("actor_type", "rebel_group"),
@@ -195,7 +195,7 @@ actors = actors_response.json()["items"]
 # Step 2: Get filtered, sorted events for a specific actor
 for actor in actors:
     events_response = requests.get(
-        f"https://api.corpus.intrace.ai/v1/corpus/actors/{actor['id']}/events",
+        f"https://api.corpus.intrace.ai/v1/actors/{actor['id']}/events",
         headers={"X-API-Key": "your-api-key"},
         params={
             "event_category": "conflict",

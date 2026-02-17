@@ -1,6 +1,6 @@
 ---
 title: "Export Events"
-api: "GET /v1/corpus/events/export"
+api: "GET /v1/events/export"
 description: "Bulk export events in CSV, JSON, GeoJSON, ACLED, or flat format"
 ---
 
@@ -52,7 +52,7 @@ Standard comma-separated values with headers. Includes all event fields plus fla
 **Example Request:**
 ```bash
 curl -H "X-API-Key: your-api-key" \
-  "https://api.corpus.intrace.ai/v1/corpus/events/export?format=csv&event_category=conflict&country=NG" \
+  "https://api.corpus.intrace.ai/v1/events/export?format=csv&event_category=conflict&country=NG" \
   -o events.csv
 ```
 
@@ -139,7 +139,7 @@ RFC 7946 compliant GeoJSON FeatureCollection suitable for mapping applications.
 **Example Request:**
 ```bash
 curl -H "X-API-Key: your-api-key" \
-  "https://api.corpus.intrace.ai/v1/corpus/events/export?format=geojson&event_category=conflict&date_from=2026-01-01" \
+  "https://api.corpus.intrace.ai/v1/events/export?format=geojson&event_category=conflict&date_from=2026-01-01" \
   -o conflict_map.geojson
 ```
 
@@ -241,7 +241,7 @@ Compatible with ACLED (Armed Conflict Location & Event Data Project) schema. **O
 **Example Request:**
 ```bash
 curl -H "X-API-Key: your-api-key" \
-  "https://api.corpus.intrace.ai/v1/corpus/events/export?format=acled&event_category=conflict&country=NG&date_from=2026-01-01&date_to=2026-01-31" \
+  "https://api.corpus.intrace.ai/v1/events/export?format=acled&event_category=conflict&country=NG&date_from=2026-01-01&date_to=2026-01-31" \
   -o nigeria_conflict_acled.json
 ```
 
@@ -315,7 +315,7 @@ Denormalized JSON with actor positions as explicit columns, suitable for spreads
 **Example Request:**
 ```bash
 curl -H "X-API-Key: your-api-key" \
-  "https://api.corpus.intrace.ai/v1/corpus/events/export?format=flat&event_category=conflict&date_from=2026-01-01" \
+  "https://api.corpus.intrace.ai/v1/events/export?format=flat&event_category=conflict&date_from=2026-01-01" \
   -o events_flat.json
 ```
 

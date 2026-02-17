@@ -110,7 +110,7 @@ This hierarchical structure enables precise filtering and analysis across 8 majo
 import requests
 
 response = requests.get(
-    "https://api.corpus.intrace.ai/v1/corpus/events",
+    "https://api.corpus.intrace.ai/v1/events",
     headers={"X-API-Key": "your-api-key"},
     params={"event_category": "conflict"}
 )
@@ -121,7 +121,7 @@ response = requests.get(
 ```python
 # Get all battles
 response = requests.get(
-    "https://api.corpus.intrace.ai/v1/corpus/events",
+    "https://api.corpus.intrace.ai/v1/events",
     headers={"X-API-Key": "your-api-key"},
     params={
         "event_category": "conflict",
@@ -137,13 +137,13 @@ Use the metadata endpoints to discover all valid filter values:
 ```python
 # Get all categories
 categories = requests.get(
-    "https://api.corpus.intrace.ai/v1/corpus/metadata/event-categories",
+    "https://api.corpus.intrace.ai/v1/metadata/event-categories",
     headers={"X-API-Key": "your-api-key"}
 ).json()
 
 # Get all types for a category
 types = requests.get(
-    "https://api.corpus.intrace.ai/v1/corpus/metadata/event-types",
+    "https://api.corpus.intrace.ai/v1/metadata/event-types",
     headers={"X-API-Key": "your-api-key"},
     params={"category": "conflict"}
 ).json()

@@ -168,7 +168,7 @@ The Corporate & M&A category includes the following complete hierarchy:
 import requests
 
 response = requests.get(
-    "https://api.corpus.intrace.ai/v1/corpus/events",
+    "https://api.corpus.intrace.ai/v1/events",
     headers={"X-API-Key": "your-api-key"},
     params={"event_category": "corporate"}
 )
@@ -179,7 +179,7 @@ events = response.json()
 
 ```python
 response = requests.get(
-    "https://api.corpus.intrace.ai/v1/corpus/events",
+    "https://api.corpus.intrace.ai/v1/events",
     headers={"X-API-Key": "your-api-key"},
     params={
         "event_category": "corporate",
