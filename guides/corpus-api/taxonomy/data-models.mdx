@@ -34,7 +34,8 @@ The standard event object returned by list endpoints.
 | `admin2` | string | Second-level administrative division, e.g. district/county (nullable) |
 | `admin3` | string | Third-level administrative division, e.g. commune/ward (nullable) |
 | `geoPrecision` | integer | Geographic precision level (nullable). See [Geo Precision Levels](#geo-precision-levels) |
-| `salienceScore` | float | Relevance/importance score (nullable) |
+| `salienceScore` | float | Confidence score indicating how reliably the event has been verified (nullable). See [Salience Score](#salience-score) |
+| `salienceReason` | string | Human-readable explanation of the confidence assessment (nullable) |
 | `articleCount` | integer | Number of source articles |
 | `actorCount` | integer | Number of actors involved |
 | `sourceDomains` | string[] | List of source domain URLs (nullable) |
@@ -50,6 +51,20 @@ The `geoPrecision` field follows ACLED convention for indicating the precision o
 | 1 | Exact / rooftop | Coordinates correspond to a specific building, intersection, or precise point |
 | 2 | District / city | Coordinates correspond to a named populated place such as a city or district centre |
 | 3 | Approximate / country | Coordinates are approximate, typically placed at a regional or country centroid |
+
+### Salience Score
+
+The `salienceScore` field is a confidence score indicating how reliably the event has been verified. Scores below 0.75 are not included in the dataset.
+
+| Score | Label | Description |
+|-------|-------|-------------|
+| 1.0 | Confirmed | The event definitely happened. Reporting is consistent, independently corroborated across multiple credible channels, or comes from an authoritative monitoring system with a strong verification process. |
+| 0.94–0.99 | High Confidence | The event almost certainly happened. It is sourced from established outlets or accounts with direct access to the situation, and the details align with other verifiable facts and known patterns in the area. |
+| 0.90–0.93 | Credible | The event very likely happened. It is reported by a verified source with a known affiliation and is broadly consistent with the established pattern of activity in the region. |
+| 0.87–0.89 | Probable | The event very likely happened, though the level of independent corroboration is more limited. It is often based on a single credible report or a small number of supporting signals, but still fits the broader context and pattern of activity in the area. |
+| 0.82–0.86 | Likely | The event very likely happened, and the core claim appears solid. Confidence is slightly lower mainly because some details remain unclear, incomplete, or only partially verified, not because the event itself appears unlikely. |
+| 0.75–0.81 | Unconfirmed | The event likely happened, but important details are still unconfirmed or only partially verified. This is a common confidence range in immediate monitoring, where the core event appears credible but reporting on the specifics may still be incomplete, inconsistent, or developing. |
+| < 0.75 | Plausible | The event may have happened, but the reporting is too limited, vague, or weakly sourced to meet the threshold for inclusion in the dataset. |
 
 ### Example JSON
 
