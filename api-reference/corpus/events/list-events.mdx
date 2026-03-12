@@ -52,6 +52,14 @@ Returns a paginated list of events. Categorical filters accept multiple values b
         "lat": 11.8311,
         "lng": 13.4302
       },
+      "fatalities": 15,
+      "injuries": 23,
+      "abductions": 0,
+      "civilianTargeting": false,
+      "admin1": "Borno",
+      "admin2": "Maiduguri",
+      "admin3": null,
+      "geoPrecision": 1,
       "salienceScore": 0.85,
       "articleCount": 3,
       "actorCount": 2,
@@ -82,6 +90,14 @@ Returns a paginated list of events. Categorical filters accept multiple values b
 | `location` | string | Specific location name (nullable) |
 | `locationCountry` | string | ISO 3166-1 alpha-2 country code (nullable) |
 | `locationCoordinates` | object | Object with `lat` and `lng` floats (nullable) |
+| `fatalities` | integer | Number of reported fatalities (nullable) |
+| `injuries` | integer | Number of reported injuries (nullable) |
+| `abductions` | integer | Number of reported abductions (nullable) |
+| `civilianTargeting` | boolean | Whether civilians were deliberately targeted (nullable) |
+| `admin1` | string | First-level administrative division, e.g. state/province (nullable) |
+| `admin2` | string | Second-level administrative division, e.g. district/county (nullable) |
+| `admin3` | string | Third-level administrative division, e.g. commune/ward (nullable) |
+| `geoPrecision` | integer | Geographic precision level: 1=exact/rooftop, 2=district/city, 3=approximate/country (nullable) |
 | `salienceScore` | float | Relevance/importance score 0.0–1.0 (nullable) |
 | `articleCount` | integer | Number of source articles |
 | `actorCount` | integer | Number of actors involved |

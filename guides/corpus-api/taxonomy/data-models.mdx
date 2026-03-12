@@ -26,12 +26,30 @@ The standard event object returned by list endpoints.
 | `location` | string | Specific location name (nullable) |
 | `locationCountry` | string | ISO country code (nullable) |
 | `locationCoordinates` | object | Coordinates object with `lat` and `lng` (nullable) |
+| `fatalities` | integer | Number of reported fatalities (nullable) |
+| `injuries` | integer | Number of reported injuries (nullable) |
+| `abductions` | integer | Number of reported abductions (nullable) |
+| `civilianTargeting` | boolean | Whether civilians were deliberately targeted (nullable) |
+| `admin1` | string | First-level administrative division, e.g. state/province (nullable) |
+| `admin2` | string | Second-level administrative division, e.g. district/county (nullable) |
+| `admin3` | string | Third-level administrative division, e.g. commune/ward (nullable) |
+| `geoPrecision` | integer | Geographic precision level (nullable). See [Geo Precision Levels](#geo-precision-levels) |
 | `salienceScore` | float | Relevance/importance score (nullable) |
 | `articleCount` | integer | Number of source articles |
 | `actorCount` | integer | Number of actors involved |
 | `sourceDomains` | string[] | List of source domain URLs (nullable) |
 | `createdAt` | datetime | When record was created |
 | `updatedAt` | datetime | When record was last updated |
+
+### Geo Precision Levels
+
+The `geoPrecision` field follows ACLED convention for indicating the precision of location coordinates.
+
+| Value | Label | Description |
+|-------|-------|-------------|
+| 1 | Exact / rooftop | Coordinates correspond to a specific building, intersection, or precise point |
+| 2 | District / city | Coordinates correspond to a named populated place such as a city or district centre |
+| 3 | Approximate / country | Coordinates are approximate, typically placed at a regional or country centroid |
 
 ### Example JSON
 
@@ -48,6 +66,14 @@ The standard event object returned by list endpoints.
   "location": "Nigeria",
   "locationCountry": "NG",
   "locationCoordinates": null,
+  "fatalities": 353,
+  "injuries": null,
+  "abductions": 60,
+  "civilianTargeting": true,
+  "admin1": "Borno",
+  "admin2": null,
+  "admin3": null,
+  "geoPrecision": 3,
   "salienceScore": null,
   "articleCount": 0,
   "actorCount": 0,
@@ -89,6 +115,14 @@ The `categorySpecificData` field contains metadata fields defined by the event's
     "lat": 48.0159,
     "lng": 37.8029
   },
+  "fatalities": 15,
+  "injuries": 23,
+  "abductions": 0,
+  "civilianTargeting": false,
+  "admin1": "Donetsk Oblast",
+  "admin2": "Donetsk",
+  "admin3": null,
+  "geoPrecision": 2,
   "salienceScore": 0.85,
   "articleCount": 3,
   "actorCount": 2,
@@ -96,10 +130,7 @@ The `categorySpecificData` field contains metadata fields defined by the event's
   "createdAt": "2026-02-10T14:30:00Z",
   "updatedAt": "2026-02-10T14:30:00Z",
   "categorySpecificData": {
-    "disorder_type": "Political violence",
-    "fatalities": 15,
-    "injuries": 23,
-    "civilian_targeting": false
+    "disorder_type": "Political violence"
   },
   "actorRolesBreakdown": null
 }
@@ -222,6 +253,17 @@ Used in responses from:
 - `/v1/metadata/event-types`
 - `/v1/metadata/event-subtypes`
 - `/v1/metadata/actor-types`
+
+## Source Reliability
+
+Sources attached to events carry a `reliability_tier` field that classifies the origin of the source material. This value is auto-assigned by the ingestion pipeline based on the scraper type that collected the article.
+
+| Value | Description |
+|-------|-------------|
+| `news_outlet` | Established news organization (wire service, newspaper, broadcaster) |
+| `social_media` | Social media platform post (Twitter/X, Facebook, Telegram, etc.) |
+| `ai_generated` | Content produced by an AI model or automated summarisation pipeline |
+| `unknown` | Source type could not be determined |
 
 ## Export Formats
 

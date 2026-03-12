@@ -171,6 +171,19 @@ Supporting Secondary: null
 
 See the [Event Data Models](/guides/corpus-api/taxonomy/data-models) page for complete field specifications and export format details.
 
+## Actor Attributes
+
+### Institution Stance
+
+The `institution_stance` field describes the actor's orientation toward established governmental and state institutions. It is set by AI during actor canonicalization and may be overridden manually.
+
+| Value | Description |
+|-------|-------------|
+| `pro_institution` | Supports existing state authority and institutional structures |
+| `anti_institution` | Actively opposes state authority and institutional structures |
+| `neutral` | No clear alignment toward or against state institutions |
+| `unknown` | Insufficient information to determine institutional stance |
+
 ## Filtering Events by Actor Type
 
 The events endpoint does not filter directly by actor type, but you can combine the actors and actor events endpoints to achieve this efficiently:

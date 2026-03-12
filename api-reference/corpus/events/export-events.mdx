@@ -79,11 +79,16 @@ Array of complete `EventDetailResponse` objects with full metadata and nested ac
     "eventDate": "2026-02-10",
     "location": "Maiduguri",
     "locationCountry": "NG",
+    "fatalities": 15,
+    "injuries": 23,
+    "abductions": 0,
+    "civilianTargeting": false,
+    "admin1": "Borno",
+    "admin2": "Maiduguri",
+    "admin3": null,
+    "geoPrecision": 1,
     "categorySpecificData": {
-      "disorder_type": "Political violence",
-      "fatalities": 15,
-      "injuries": 23,
-      "civilian_targeting": false
+      "disorder_type": "Political violence"
     },
     "actorRolesBreakdown": {
       "perpetrator": ["Nigerian Army"],
@@ -128,6 +133,10 @@ RFC 7946 compliant GeoJSON FeatureCollection suitable for mapping applications.
         "event_date": "2026-02-10",
         "location": "Maiduguri",
         "location_country": "NG",
+        "admin1": "Borno",
+        "admin2": "Maiduguri",
+        "admin3": null,
+        "geo_precision": 1,
         "salience_score": 0.85,
         "fatalities": 15
       }
@@ -160,7 +169,7 @@ Compatible with ACLED (Armed Conflict Location & Event Data Project) schema. **O
 | `event_id_cnty` | string | Event ID with country code prefix (e.g., "NGA12345678") |
 | `event_date` | string | Event date (YYYY-MM-DD) |
 | `year` | integer | Event year |
-| `time_precision` | integer | 1=day, 2=month, 3=year |
+| `time_precision` | integer | 1=day, 2=week, 3=month (per ACLED standard) |
 | `disorder_type` | string | Disorder classification (e.g., "Political violence") |
 | `event_type` | string | ACLED event type (e.g., "Battles", "Violence against civilians") |
 | `sub_event_type` | string | ACLED sub-event type (e.g., "Armed clash", "Attack") |
@@ -183,7 +192,7 @@ Compatible with ACLED (Armed Conflict Location & Event Data Project) schema. **O
 | `location` | string | Specific location name |
 | `latitude` | float | Latitude coordinate |
 | `longitude` | float | Longitude coordinate |
-| `geo_precision` | integer | Geographic precision level |
+| `geo_precision` | integer | Geographic precision level: 1=exact/rooftop, 2=district/city, 3=approximate/country |
 | `source` | string | Source names, semicolon-separated |
 | `notes` | string | Event description/notes |
 | `fatalities` | integer | Number of reported fatalities |
@@ -287,15 +296,16 @@ Denormalized JSON with actor positions as explicit columns, suitable for spreads
       "lat": 11.8311,
       "lng": 13.4302
     },
-    "administrative_hierarchy": [
-      {"level": 1, "type": "state", "name": "Borno"},
-      {"level": 2, "type": "LGA", "name": "Maiduguri"}
-    ],
+    "fatalities": 15,
+    "injuries": 23,
+    "abductions": 0,
+    "civilian_targeting": false,
+    "admin1": "Borno",
+    "admin2": "Maiduguri",
+    "admin3": null,
+    "geo_precision": 1,
     "category_specific_data": {
-      "disorder_type": "Political violence",
-      "fatalities": 15,
-      "injuries": 23,
-      "civilian_targeting": false
+      "disorder_type": "Political violence"
     },
     "salience_score": 0.85,
     "principal_actor": "Nigerian Army",
