@@ -35,7 +35,7 @@ The standard event object returned by list endpoints.
 | `admin3` | string | Third-level administrative division, e.g. commune/ward (nullable) |
 | `geoPrecision` | integer | Geographic precision level (nullable). See [Geo Precision Levels](#geo-precision-levels) |
 | `salienceScore` | float | Confidence score indicating how reliably the event has been verified (nullable). See [Salience Score](#salience-score) |
-| `salienceReason` | string | Human-readable explanation of the confidence assessment (nullable) |
+| `salienceRationale` | string | Human-readable explanation of the confidence assessment (nullable) |
 | `articleCount` | integer | Number of source articles |
 | `actorCount` | integer | Number of actors involved |
 | `sourceDomains` | string[] | List of source domain URLs (nullable) |
@@ -90,6 +90,7 @@ The `salienceScore` field is a confidence score indicating how reliably the even
   "admin3": null,
   "geoPrecision": 3,
   "salienceScore": null,
+  "salienceRationale": null,
   "articleCount": 0,
   "actorCount": 0,
   "sourceDomains": null,
@@ -139,6 +140,7 @@ The `categorySpecificData` field contains metadata fields defined by the event's
   "admin3": null,
   "geoPrecision": 2,
   "salienceScore": 0.85,
+  "salienceRationale": null,
   "articleCount": 3,
   "actorCount": 2,
   "sourceDomains": ["reuters.com", "bbc.co.uk"],
